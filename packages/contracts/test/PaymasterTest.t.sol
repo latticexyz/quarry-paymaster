@@ -117,6 +117,11 @@ contract PaymasterTest is MudTest {
     assertLt(ComputeUnits.get(address(account)), requiredUnits);
   }
 
+  function testCallFromWithPaymaster() external {
+    // TODO: mock a `callFrom` call to a world, expect the delegator to be charged
+    revert("TODO");
+  }
+
   function fillUserOp(
     SimpleAccount _sender,
     uint256 _key,
