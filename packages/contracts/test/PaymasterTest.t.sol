@@ -8,8 +8,12 @@ import { EntryPoint, IEntryPoint } from "@account-abstraction/contracts/core/Ent
 import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import { SimpleAccountFactory, SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccountFactory.sol";
 import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
 
-import { PaymasterSystem } from "../src/systems/PaymasterSystem.sol";
+import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.sol";
+import { ComputeUnits } from "../src/namespaces/root/codegen/tables/ComputeUnits.sol";
+import { ComputeUnitManager } from "../src/namespaces/root/codegen/tables/ComputeUnitManager.sol";
+import { NamespaceOwner } from "../src/namespaces/world/codegen/tables/NamespaceOwner.sol";
 import { TestCounter } from "./utils/TestCounter.sol";
 import { IWorld } from "../src/codegen/world/IWorld.sol";
 
@@ -21,8 +25,12 @@ contract PaymasterTest is MudTest {
 
   address payable beneficiary;
   address user;
+  address admin;
+  address computeUnitManager;
   uint256 userKey;
   SimpleAccount account;
+
+  uint256 initialManagerAllowance = 10 ether;
 
   function setUp() public override {
     super.setUp();
@@ -33,9 +41,14 @@ contract PaymasterTest is MudTest {
 
     beneficiary = payable(makeAddr("beneficiary"));
     (user, userKey) = makeAddrAndKey("user");
+    admin = NamespaceOwner.get(paymaster, ROOT_NAMESPACE_ID);
+    computeUnitManager = payable(makeAddr("computeUnitManager"));
     account = accountFactory.createAccount(user, 0);
 
     entryPoint.depositTo{ value: 10 ether }(address(paymaster));
+
+    vm.prank(admin);
+    paymaster.setComputeUnitManagerAllowance(computeUnitManager, initialManagerAllowance);
   }
 
   function testWorldExists() public {
@@ -78,6 +91,30 @@ contract PaymasterTest is MudTest {
       abi.encodeWithSelector(PaymasterSystem.InsufficientComputeUnits.selector, uint256(0), uint256(380000000000000))
     );
     submitUserOp(op);
+  }
+
+  function testCallWithPaymaster() external {
+    vm.deal(address(account), 1e18);
+    PackedUserOperation memory op = fillUserOp(
+      account,
+      userKey,
+      address(counter),
+      0,
+      abi.encodeWithSelector(TestCounter.count.selector)
+    );
+
+    op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(100000), uint128(100000));
+    op.signature = signUserOp(op, userKey);
+
+    // Grant sufficient computation units for the account
+    uint256 requiredUnits = 380000000000000;
+    vm.prank(computeUnitManager);
+    paymaster.addComputeUnits(address(account), requiredUnits);
+    assertEq(ComputeUnitManager.getAllowance(computeUnitManager), initialManagerAllowance - requiredUnits);
+    assertEq(ComputeUnits.get(address(account)), requiredUnits);
+
+    submitUserOp(op);
+    assertLt(ComputeUnits.get(address(account)), requiredUnits);
   }
 
   function fillUserOp(
