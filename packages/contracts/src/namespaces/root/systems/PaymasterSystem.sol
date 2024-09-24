@@ -5,10 +5,17 @@ import "forge-std/console.sol";
 import { IPaymaster } from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import { System } from "@latticexyz/world/src/System.sol";
+import { SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccount.sol";
+import { IWorldCall } from "@latticexyz/world/src/IWorldKernel.sol";
+import { Delegation } from "@latticexyz/world/src/Delegation.sol";
+import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
+import { IStore } from "@latticexyz/store/src/IStore.sol";
 
 import { ComputeUnits } from "../codegen/tables/ComputeUnits.sol";
+import { UserDelegationControl } from "../../world/codegen/tables/UserDelegationControl.sol";
 
 contract PaymasterSystem is System, IPaymaster {
+  using SimpleAccountUserOperationLib for PackedUserOperation;
   error InsufficientComputeUnits(uint256 available, uint256 required);
 
   /**
@@ -34,8 +41,8 @@ contract PaymasterSystem is System, IPaymaster {
     bytes32 userOpHash,
     uint256 maxCost
   ) public override returns (bytes memory context, uint256 validationData) {
-    // TODO: if the call is a `world.callFrom` call, validate the delegation and then use `from` instead
-    address from = userOp.sender;
+    // TODO: verify the call is coming from the entry point contract
+    address from = _getFromAddress(userOp);
     uint256 availableComputeUnits = ComputeUnits._get(from);
 
     if (availableComputeUnits < maxCost) {
@@ -64,9 +71,78 @@ contract PaymasterSystem is System, IPaymaster {
     uint256 actualGasCost,
     uint256 actualUserOpFeePerGas
   ) public override {
+    // TODO: verify the call is coming from the entry point contract
+
     address from = abi.decode(context, (address));
 
     // Deduct the gas cost from the user's compute units
     ComputeUnits._set(from, ComputeUnits._get(from) - actualGasCost);
   }
+
+  /**
+   * If this is a call to `callFrom`, extract the delegator and validate the delegation
+   */
+  function _getFromAddress(PackedUserOperation calldata userOp) internal returns (address) {
+    // Early return if this is not a call to the simple smart account's execute function
+    if (!userOp.isExecuteCall()) {
+      return userOp.sender;
+    }
+
+    // Early return the target is not a World's callFrom function
+    bytes calldata callData = userOp.getExecuteCallData();
+    if (getFunctionSelector(callData) != IWorldCall.callFrom.selector) {
+      return userOp.sender;
+    }
+
+    // Validate the delegation
+    address target = userOp.getExecuteDestination();
+    // TODO: would this be more efficient if we read directly from the calldata instead of abi.decode?
+    (address from, ResourceId systemId, bytes memory systemCallData) = abi.decode(
+      callData,
+      (address, ResourceId, bytes)
+    );
+    ResourceId delegation = UserDelegationControl.get({
+      _store: IStore(target),
+      delegator: from,
+      delegatee: userOp.sender
+    });
+    bool isValidDelegation = Delegation.verify({
+      delegationControlId: delegation,
+      delegator: from,
+      delegatee: userOp.sender,
+      systemId: systemId,
+      callData: systemCallData
+    });
+
+    // If this is a valid `callFrom` call, use the delegator's compute units
+    if (isValidDelegation) {
+      return from;
+    }
+
+    return userOp.sender;
+  }
+}
+
+// Extract arguments from SimpleAccount.execute call
+library SimpleAccountUserOperationLib {
+  function isExecuteCall(PackedUserOperation calldata op) internal pure returns (bool) {
+    return getFunctionSelector(op.callData) == SimpleAccount.execute.selector;
+  }
+
+  function getExecuteDestination(PackedUserOperation calldata op) internal pure returns (address) {
+    return address(uint160(uint256(bytes32(getArguments(op.callData)[0:32]))));
+  }
+
+  function getExecuteCallData(PackedUserOperation calldata op) internal pure returns (bytes calldata) {
+    // destination (32B) | value (32B) | first encoding length (32B) | second encoding length (32B) | call data bytes
+    return getArguments(op.callData)[128:];
+  }
+}
+
+function getFunctionSelector(bytes calldata callData) pure returns (bytes4) {
+  return bytes4(callData[0:4]);
+}
+
+function getArguments(bytes calldata callData) pure returns (bytes calldata) {
+  return callData[4:];
 }

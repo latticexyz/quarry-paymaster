@@ -36,6 +36,20 @@ const config = defineWorld({
             storeArgument: true,
           },
         },
+        UserDelegationControl: {
+          schema: {
+            delegator: "address",
+            delegatee: "address",
+            delegationControlId: "ResourceId",
+          },
+          key: ["delegator", "delegatee"],
+          deploy: {
+            disabled: true,
+          },
+          codegen: {
+            storeArgument: true,
+          },
+        },
       },
     },
   },
