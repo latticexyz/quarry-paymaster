@@ -58,6 +58,20 @@ contract PaymasterTest is MudTest {
     submitUserOp(op);
   }
 
+  function testCallWithPaymaster() external {
+    vm.deal(address(account), 1e18);
+    PackedUserOperation memory op = fillUserOp(
+      account,
+      userKey,
+      address(counter),
+      0,
+      abi.encodeWithSelector(TestCounter.count.selector)
+    );
+    op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(100000), uint128(100000));
+    op.signature = signUserOp(op, userKey);
+    submitUserOp(op);
+  }
+
   function testBalance() public {}
 
   function fillUserOp(
@@ -72,7 +86,8 @@ contract PaymasterTest is MudTest {
     op.callData = abi.encodeWithSelector(SimpleAccount.execute.selector, _to, _value, _data);
     op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(80000)), bytes16(uint128(50000))));
     op.preVerificationGas = 50000;
-    op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(100)), bytes16(uint128(1000000000))));
+    // NOTE: gas fees are set to 0 on purpose to not require paymaster to have a deposit
+    op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(0)), bytes16(uint128(0))));
     op.signature = signUserOp(op, _key);
     return op;
   }
