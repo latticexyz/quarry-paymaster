@@ -4,11 +4,12 @@ pragma solidity >=0.8.24;
 import "forge-std/Test.sol";
 import { MudTest } from "@latticexyz/world/test/MudTest.t.sol";
 import { getKeysWithValue } from "@latticexyz/world-modules/src/modules/keyswithvalue/getKeysWithValue.sol";
-import { EntryPoint } from "@account-abstraction/contracts/core/EntryPoint.sol";
+import { EntryPoint, IEntryPoint } from "@account-abstraction/contracts/core/EntryPoint.sol";
 import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import { SimpleAccountFactory, SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccountFactory.sol";
 import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
+import { PaymasterSystem } from "../src/systems/PaymasterSystem.sol";
 import { TestCounter } from "./utils/TestCounter.sol";
 import { IWorld } from "../src/codegen/world/IWorld.sol";
 
@@ -33,6 +34,8 @@ contract PaymasterTest is MudTest {
     beneficiary = payable(makeAddr("beneficiary"));
     (user, userKey) = makeAddrAndKey("user");
     account = accountFactory.createAccount(user, 0);
+
+    entryPoint.depositTo{ value: 10 ether }(address(paymaster));
   }
 
   function testWorldExists() public {
@@ -58,7 +61,7 @@ contract PaymasterTest is MudTest {
     submitUserOp(op);
   }
 
-  function testCallWithPaymaster() external {
+  function testCallWithPaymaster_InsufficientBalance() external {
     vm.deal(address(account), 1e18);
     PackedUserOperation memory op = fillUserOp(
       account,
@@ -67,12 +70,15 @@ contract PaymasterTest is MudTest {
       0,
       abi.encodeWithSelector(TestCounter.count.selector)
     );
+
     op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(100000), uint128(100000));
     op.signature = signUserOp(op, userKey);
+
+    expectUserOpRevert(
+      abi.encodeWithSelector(PaymasterSystem.InsufficientComputeUnits.selector, uint256(0), uint256(380000000000000))
+    );
     submitUserOp(op);
   }
-
-  function testBalance() public {}
 
   function fillUserOp(
     SimpleAccount _sender,
@@ -80,27 +86,34 @@ contract PaymasterTest is MudTest {
     address _to,
     uint256 _value,
     bytes memory _data
-  ) public view returns (PackedUserOperation memory op) {
+  ) internal view returns (PackedUserOperation memory op) {
     op.sender = address(_sender);
     op.nonce = entryPoint.getNonce(address(_sender), 0);
     op.callData = abi.encodeWithSelector(SimpleAccount.execute.selector, _to, _value, _data);
     op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(80000)), bytes16(uint128(50000))));
     op.preVerificationGas = 50000;
+    op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(100)), bytes16(uint128(1000000000))));
     // NOTE: gas fees are set to 0 on purpose to not require paymaster to have a deposit
-    op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(0)), bytes16(uint128(0))));
+    // op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(0)), bytes16(uint128(0))));
     op.signature = signUserOp(op, _key);
     return op;
   }
 
-  function signUserOp(PackedUserOperation memory op, uint256 _key) public view returns (bytes memory signature) {
+  function signUserOp(PackedUserOperation memory op, uint256 _key) internal view returns (bytes memory signature) {
     bytes32 hash = entryPoint.getUserOpHash(op);
     (uint8 v, bytes32 r, bytes32 s) = vm.sign(_key, MessageHashUtils.toEthSignedMessageHash(hash));
     signature = abi.encodePacked(r, s, v);
   }
 
-  function submitUserOp(PackedUserOperation memory op) public {
+  function submitUserOp(PackedUserOperation memory op) internal {
     PackedUserOperation[] memory ops = new PackedUserOperation[](1);
     ops[0] = op;
     entryPoint.handleOps(ops, beneficiary);
+  }
+
+  function expectUserOpRevert(bytes memory message) internal {
+    vm.expectRevert(
+      abi.encodeWithSelector(IEntryPoint.FailedOpWithRevert.selector, uint256(0), "AA33 reverted", message)
+    );
   }
 }

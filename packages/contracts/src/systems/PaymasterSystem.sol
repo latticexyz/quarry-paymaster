@@ -6,7 +6,11 @@ import { IPaymaster } from "@account-abstraction/contracts/interfaces/IPaymaster
 import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import { System } from "@latticexyz/world/src/System.sol";
 
+import { ComputeUnits } from "../codegen/tables/ComputeUnits.sol";
+
 contract PaymasterSystem is System, IPaymaster {
+  error InsufficientComputeUnits(uint256 available, uint256 required);
+
   /**
    * Payment validation: check if paymaster agrees to pay.
    * Must verify sender is the entryPoint.
@@ -30,7 +34,15 @@ contract PaymasterSystem is System, IPaymaster {
     bytes32 userOpHash,
     uint256 maxCost
   ) public override returns (bytes memory context, uint256 validationData) {
-    console.log("maxCost", maxCost);
+    // TODO: if the call is a `world.callFrom` call, validate the delegation and then use `from` instead
+    address from = userOp.sender;
+    uint256 availableComputeUnits = ComputeUnits._get(from);
+
+    if (availableComputeUnits < maxCost) {
+      revert InsufficientComputeUnits(availableComputeUnits, maxCost);
+    }
+
+    context = abi.encode(from);
   }
 
   /**
@@ -52,9 +64,9 @@ contract PaymasterSystem is System, IPaymaster {
     uint256 actualGasCost,
     uint256 actualUserOpFeePerGas
   ) public override {
-    console.log("context");
-    console.logBytes(context);
-    console.log("actualGasCost", actualGasCost);
-    console.log("actualUserOpFeePerGas", actualUserOpFeePerGas);
+    address from = abi.decode(context, (address));
+
+    // Deduct the gas cost from the user's compute units
+    ComputeUnits._set(from, ComputeUnits._get(from) - actualGasCost);
   }
 }
