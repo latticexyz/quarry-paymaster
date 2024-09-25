@@ -26,6 +26,12 @@ const config = defineWorld({
           },
           key: ["spender"],
         },
+        SystemConfig: {
+          schema: {
+            entryPoint: "address",
+          },
+          key: [],
+        },
       },
     },
     world: {

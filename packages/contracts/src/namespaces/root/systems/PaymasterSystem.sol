@@ -8,10 +8,12 @@ import { System } from "@latticexyz/world/src/System.sol";
 
 import { Allowance } from "../codegen/tables/Allowance.sol";
 import { Spender } from "../codegen/tables/Spender.sol";
+import { SystemConfig } from "../codegen/tables/SystemConfig.sol";
 import { recoverCallWithSignature } from "../utils/recoverCallWithSignature.sol";
 
 contract PaymasterSystem is System, IPaymaster {
-  error InsufficientAllowance(address user, uint256 available, uint256 required);
+  error PaymasterSystem_InsufficientAllowance(address user, uint256 available, uint256 required);
+  error PaymasterSystem_OnlyEntryPoint();
 
   /**
    * Payment validation: check if paymaster agrees to pay.
@@ -36,12 +38,13 @@ contract PaymasterSystem is System, IPaymaster {
     bytes32 userOpHash,
     uint256 maxCost
   ) public override returns (bytes memory context, uint256 validationData) {
-    // TODO: verify the call is coming from the entry point contract
+    _requireFromEntryPoint();
+
     address user = _getUser(userOp);
     uint256 availableAllowance = Allowance._get(user);
 
     if (availableAllowance < maxCost) {
-      revert InsufficientAllowance(user, availableAllowance, maxCost);
+      revert PaymasterSystem_InsufficientAllowance(user, availableAllowance, maxCost);
     }
 
     Allowance._set(user, availableAllowance - maxCost);
@@ -68,7 +71,8 @@ contract PaymasterSystem is System, IPaymaster {
     uint256 actualGasCost,
     uint256 actualUserOpFeePerGas
   ) public override {
-    // TODO: verify the call is coming from the entry point contract
+    _requireFromEntryPoint();
+
     (address user, uint256 maxCost) = abi.decode(context, (address, uint256));
 
     // Refund the unused cost
@@ -76,6 +80,10 @@ contract PaymasterSystem is System, IPaymaster {
     Allowance._set(user, currentAllowance + maxCost - actualGasCost);
   }
 
+  /**
+   * If this user op is sent from a spender account, translate it to the user account.
+   * Else return the userOp sender.
+   */
   function _getUser(PackedUserOperation calldata userOp) internal view returns (address) {
     // Check if this is a spender account
     address user = Spender.getUser(userOp.sender);
@@ -90,5 +98,14 @@ contract PaymasterSystem is System, IPaymaster {
     }
 
     return userOp.sender;
+  }
+
+  /**
+   * Validate the call is made from a valid entrypoint
+   */
+  function _requireFromEntryPoint() internal virtual {
+    if (_msgSender() != SystemConfig.getEntryPoint()) {
+      revert PaymasterSystem_OnlyEntryPoint();
+    }
   }
 }

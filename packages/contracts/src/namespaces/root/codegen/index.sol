@@ -6,3 +6,4 @@ pragma solidity >=0.8.24;
 import { Allowance } from "./tables/Allowance.sol";
 import { Grantor } from "./tables/Grantor.sol";
 import { Spender } from "./tables/Spender.sol";
+import { SystemConfig } from "./tables/SystemConfig.sol";
