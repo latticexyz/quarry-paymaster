@@ -9,11 +9,12 @@ import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/P
 import { SimpleAccountFactory, SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccountFactory.sol";
 import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
+import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOwner.sol";
 
 import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.sol";
 import { Allowance } from "../src/namespaces/root/codegen/tables/Allowance.sol";
 import { Grantor } from "../src/namespaces/root/codegen/tables/Grantor.sol";
-import { NamespaceOwner } from "../src/namespaces/world/codegen/tables/NamespaceOwner.sol";
+import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
 import { TestCounter } from "./utils/TestCounter.sol";
 import { IWorld } from "../src/codegen/world/IWorld.sol";
 
@@ -41,7 +42,7 @@ contract PaymasterTest is MudTest {
 
     beneficiary = payable(makeAddr("beneficiary"));
     (user, userKey) = makeAddrAndKey("user");
-    admin = NamespaceOwner.get(paymaster, ROOT_NAMESPACE_ID);
+    admin = NamespaceOwner.get(ROOT_NAMESPACE_ID);
     grantor = payable(makeAddr("grantor"));
     account = accountFactory.createAccount(user, 0);
 
@@ -49,6 +50,9 @@ contract PaymasterTest is MudTest {
 
     vm.prank(admin);
     paymaster.setGrantAllowance(grantor, grantAllowance);
+
+    vm.prank(admin);
+    SystemConfig.setEntryPoint(address(entryPoint));
   }
 
   function testWorldExists() public {
@@ -89,7 +93,7 @@ contract PaymasterTest is MudTest {
 
     expectUserOpRevert(
       abi.encodeWithSelector(
-        PaymasterSystem.InsufficientAllowance.selector,
+        PaymasterSystem.PaymasterSystem_InsufficientAllowance.selector,
         address(account),
         uint256(0),
         uint256(380000000000000)
@@ -145,7 +149,7 @@ contract PaymasterTest is MudTest {
     // Expect the call to fail while the account is not a spender of the user
     expectUserOpRevert(
       abi.encodeWithSelector(
-        PaymasterSystem.InsufficientAllowance.selector,
+        PaymasterSystem.PaymasterSystem_InsufficientAllowance.selector,
         account,
         uint256(0),
         uint256(380000000000000)

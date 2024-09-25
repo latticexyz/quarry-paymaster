@@ -6,6 +6,7 @@ import { console } from "forge-std/console.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 
 import { IWorld } from "../src/codegen/world/IWorld.sol";
+import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
 
 contract PostDeploy is Script {
   function run(address worldAddress) external {
@@ -17,6 +18,8 @@ contract PostDeploy is Script {
 
     // Start broadcasting transactions from the deployer account
     vm.startBroadcast(deployerPrivateKey);
+
+    SystemConfig.set(0x0000000071727De22E5E9d8BAf0edAc6f37da032);
 
     vm.stopBroadcast();
   }

@@ -34,23 +34,6 @@ const config = defineWorld({
         },
       },
     },
-    world: {
-      tables: {
-        NamespaceOwner: {
-          schema: {
-            namespaceId: "ResourceId",
-            owner: "address",
-          },
-          key: ["namespaceId"],
-          deploy: {
-            disabled: true,
-          },
-          codegen: {
-            storeArgument: true,
-          },
-        },
-      },
-    },
   },
   userTypes: {
     ResourceId: {
