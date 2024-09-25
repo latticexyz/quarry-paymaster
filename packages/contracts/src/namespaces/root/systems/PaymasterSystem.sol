@@ -5,18 +5,12 @@ import "forge-std/console.sol";
 import { IPaymaster } from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import { System } from "@latticexyz/world/src/System.sol";
-import { SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccount.sol";
-import { IWorldCall } from "@latticexyz/world/src/IWorldKernel.sol";
-import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
-import { IStore } from "@latticexyz/store/src/IStore.sol";
-import { Unstable_CallWithSignatureSystem } from "@latticexyz/world-modules/src/modules/callwithsignature/Unstable_CallWithSignatureModule.sol";
-import { validateCallWithSignature } from "@latticexyz/world-modules/src/modules/callwithsignature/validateCallWithSignature.sol";
 
 import { Allowance } from "../codegen/tables/Allowance.sol";
 import { Spender } from "../codegen/tables/Spender.sol";
+import { recoverCallWithSignature } from "../utils/recoverCallWithSignature.sol";
 
 contract PaymasterSystem is System, IPaymaster {
-  using SimpleAccountUserOperationLib for PackedUserOperation;
   error InsufficientAllowance(address user, uint256 available, uint256 required);
 
   /**
@@ -89,68 +83,12 @@ contract PaymasterSystem is System, IPaymaster {
       return user;
     }
 
-    // Check if this is a call to register a new spender via `callWithSignature
-    user = _recoverCallWithSignature(userOp);
+    // Check if this is a call to register a new spender via `callWithSignature`
+    user = recoverCallWithSignature(userOp);
     if (user != address(0)) {
       return user;
     }
 
     return userOp.sender;
   }
-
-  /**
-   * Recover the signer from a `callWithSignature` to this paymaster
-   */
-  function _recoverCallWithSignature(PackedUserOperation calldata userOp) internal view returns (address) {
-    // Require this to be a call to the smart account's `execute` function
-    if (!userOp.isExecuteCall()) {
-      return address(0);
-    }
-
-    // Require the target of this `execute` call to be this contract
-    if (userOp.getExecuteDestination() != _world()) {
-      return address(0);
-    }
-
-    // Extract the function payload from the `execute` call
-    bytes calldata executeCallData = userOp.getExecuteCallData();
-
-    // Require the target of this `execute` call to be `callWithSignature`
-    if (getFunctionSelector(executeCallData) != Unstable_CallWithSignatureSystem.callWithSignature.selector) {
-      return address(0);
-    }
-
-    // Validate the signature
-    (address signer, ResourceId systemId, bytes memory callData, bytes memory signature) = abi.decode(
-      getArguments(executeCallData),
-      (address, ResourceId, bytes, bytes)
-    );
-    validateCallWithSignature(signer, systemId, callData, signature);
-
-    return signer;
-  }
-}
-
-// Extract arguments from SimpleAccount.execute call
-library SimpleAccountUserOperationLib {
-  function isExecuteCall(PackedUserOperation calldata op) internal pure returns (bool) {
-    return getFunctionSelector(op.callData) == SimpleAccount.execute.selector;
-  }
-
-  function getExecuteDestination(PackedUserOperation calldata op) internal pure returns (address) {
-    return address(uint160(uint256(bytes32(getArguments(op.callData)[0:32]))));
-  }
-
-  function getExecuteCallData(PackedUserOperation calldata op) internal pure returns (bytes calldata) {
-    // destination (32B) | value (32B) | first encoding length (32B) | second encoding length (32B) | call data bytes
-    return getArguments(op.callData)[128:];
-  }
-}
-
-function getFunctionSelector(bytes calldata callData) pure returns (bytes4) {
-  return bytes4(callData[0:4]);
-}
-
-function getArguments(bytes calldata callData) pure returns (bytes calldata) {
-  return callData[4:];
 }
