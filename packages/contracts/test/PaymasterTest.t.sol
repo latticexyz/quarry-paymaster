@@ -25,9 +25,9 @@ contract PaymasterTest is MudTest {
 
   address payable beneficiary;
   address user;
+  uint256 userKey;
   address admin;
   address grantor;
-  uint256 userKey;
   SimpleAccount account;
 
   uint256 grantAllowance = 10 ether;
@@ -88,7 +88,12 @@ contract PaymasterTest is MudTest {
     op.signature = signUserOp(op, userKey);
 
     expectUserOpRevert(
-      abi.encodeWithSelector(PaymasterSystem.InsufficientAllowance.selector, uint256(0), uint256(380000000000000))
+      abi.encodeWithSelector(
+        PaymasterSystem.InsufficientAllowance.selector,
+        address(account),
+        uint256(0),
+        uint256(380000000000000)
+      )
     );
     submitUserOp(op);
   }
@@ -117,9 +122,45 @@ contract PaymasterTest is MudTest {
     assertLt(Allowance.get(address(account)), requiredAllowance);
   }
 
-  function testCallFromWithPaymaster() external {
-    // TODO: mock a `callFrom` call to a world, expect the delegator to be charged
-    revert("TODO");
+  function testCallWithSpender() external {
+    vm.deal(address(account), 1e18);
+    PackedUserOperation memory op = fillUserOp(
+      account,
+      userKey,
+      address(counter),
+      0,
+      abi.encodeWithSelector(TestCounter.count.selector)
+    );
+
+    op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(100000), uint128(100000));
+    op.signature = signUserOp(op, userKey);
+
+    // Grant sufficient computation units to the user
+    uint256 requiredAllowance = 380000000000000;
+    vm.prank(grantor);
+    paymaster.grantAllowance(user, requiredAllowance);
+    assertEq(Grantor.getAllowance(grantor), grantAllowance - requiredAllowance);
+    assertEq(Allowance.get(user), requiredAllowance);
+
+    // Expect the call to fail while the account is not a spender of the user
+    expectUserOpRevert(
+      abi.encodeWithSelector(
+        PaymasterSystem.InsufficientAllowance.selector,
+        account,
+        uint256(0),
+        uint256(380000000000000)
+      )
+    );
+    submitUserOp(op);
+    assertEq(Allowance.get(address(user)), requiredAllowance);
+
+    // Register the account as spender for the user
+    vm.prank(user);
+    paymaster.registerSpender(address(account));
+
+    // Expect the user op to succeed now and the balance to be taken from the user account
+    submitUserOp(op);
+    assertLt(Allowance.get(address(user)), requiredAllowance);
   }
 
   function fillUserOp(

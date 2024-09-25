@@ -5,4 +5,4 @@ pragma solidity >=0.8.24;
 
 import { Allowance } from "./tables/Allowance.sol";
 import { Grantor } from "./tables/Grantor.sol";
-import { Delegation } from "./tables/Delegation.sol";
+import { Spender } from "./tables/Spender.sol";

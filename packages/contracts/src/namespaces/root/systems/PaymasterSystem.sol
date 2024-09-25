@@ -13,19 +13,11 @@ import { Unstable_CallWithSignatureSystem } from "@latticexyz/world-modules/src/
 import { validateCallWithSignature } from "@latticexyz/world-modules/src/modules/callwithsignature/validateCallWithSignature.sol";
 
 import { Allowance } from "../codegen/tables/Allowance.sol";
-import { Delegation } from "../codegen/tables/Delegation.sol";
-
-/**
- * TODO:
- * - There is a griefing attack vector in which Alice declares a delegation for Bob,
- *   but Alice doesn't have an allowance, so now if Bob wants to send a user operation
- *   it fails because only Alice's balance is checked. To prevent this, we should prevent
- *   registering a delegation for a spender that already has a delegation, and set the user as its own spender
- */
+import { Spender } from "../codegen/tables/Spender.sol";
 
 contract PaymasterSystem is System, IPaymaster {
   using SimpleAccountUserOperationLib for PackedUserOperation;
-  error InsufficientAllowance(uint256 available, uint256 required);
+  error InsufficientAllowance(address user, uint256 available, uint256 required);
 
   /**
    * Payment validation: check if paymaster agrees to pay.
@@ -55,7 +47,7 @@ contract PaymasterSystem is System, IPaymaster {
     uint256 availableAllowance = Allowance._get(user);
 
     if (availableAllowance < maxCost) {
-      revert InsufficientAllowance(availableAllowance, maxCost);
+      revert InsufficientAllowance(user, availableAllowance, maxCost);
     }
 
     Allowance._set(user, availableAllowance - maxCost);
@@ -90,17 +82,17 @@ contract PaymasterSystem is System, IPaymaster {
     Allowance._set(user, currentAllowance + maxCost - actualGasCost);
   }
 
-  function _getUser(PackedUserOperation calldata userOp) internal view returns (address user) {
-    // Check if there is an active delegation for this account
-    address delegator = Delegation.getDelegator(userOp.sender);
-    if (delegator != address(0)) {
-      return delegator;
+  function _getUser(PackedUserOperation calldata userOp) internal view returns (address) {
+    // Check if this is a spender account
+    address user = Spender.getUser(userOp.sender);
+    if (user != address(0)) {
+      return user;
     }
 
-    // Check if this is a call to register a new delegation via `callWithSignature`
-    delegator = _recoverCallWithSignature(userOp);
-    if (delegator != address(0)) {
-      return delegator;
+    // Check if this is a call to register a new spender via `callWithSignature
+    user = _recoverCallWithSignature(userOp);
+    if (user != address(0)) {
+      return user;
     }
 
     return userOp.sender;

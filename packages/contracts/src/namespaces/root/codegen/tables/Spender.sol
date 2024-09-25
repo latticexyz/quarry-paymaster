@@ -16,9 +16,9 @@ import { Schema } from "@latticexyz/store/src/Schema.sol";
 import { EncodedLengths, EncodedLengthsLib } from "@latticexyz/store/src/EncodedLengths.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 
-library Delegation {
-  // Hex below is the result of `WorldResourceIdLib.encode({ namespace: "", name: "Delegation", typeId: RESOURCE_TABLE });`
-  ResourceId constant _tableId = ResourceId.wrap(0x7462000000000000000000000000000044656c65676174696f6e000000000000);
+library Spender {
+  // Hex below is the result of `WorldResourceIdLib.encode({ namespace: "", name: "Spender", typeId: RESOURCE_TABLE });`
+  ResourceId constant _tableId = ResourceId.wrap(0x746200000000000000000000000000005370656e646572000000000000000000);
 
   FieldLayout constant _fieldLayout =
     FieldLayout.wrap(0x0014010014000000000000000000000000000000000000000000000000000000);
@@ -34,7 +34,7 @@ library Delegation {
    */
   function getKeyNames() internal pure returns (string[] memory keyNames) {
     keyNames = new string[](1);
-    keyNames[0] = "delegatee";
+    keyNames[0] = "spender";
   }
 
   /**
@@ -43,7 +43,7 @@ library Delegation {
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
     fieldNames = new string[](1);
-    fieldNames[0] = "delegator";
+    fieldNames[0] = "user";
   }
 
   /**
@@ -61,95 +61,95 @@ library Delegation {
   }
 
   /**
-   * @notice Get delegator.
+   * @notice Get user.
    */
-  function getDelegator(address delegatee) internal view returns (address delegator) {
+  function getUser(address spender) internal view returns (address user) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (address(bytes20(_blob)));
   }
 
   /**
-   * @notice Get delegator.
+   * @notice Get user.
    */
-  function _getDelegator(address delegatee) internal view returns (address delegator) {
+  function _getUser(address spender) internal view returns (address user) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (address(bytes20(_blob)));
   }
 
   /**
-   * @notice Get delegator.
+   * @notice Get user.
    */
-  function get(address delegatee) internal view returns (address delegator) {
+  function get(address spender) internal view returns (address user) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (address(bytes20(_blob)));
   }
 
   /**
-   * @notice Get delegator.
+   * @notice Get user.
    */
-  function _get(address delegatee) internal view returns (address delegator) {
+  function _get(address spender) internal view returns (address user) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (address(bytes20(_blob)));
   }
 
   /**
-   * @notice Set delegator.
+   * @notice Set user.
    */
-  function setDelegator(address delegatee, address delegator) internal {
+  function setUser(address spender, address user) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((delegator)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((user)), _fieldLayout);
   }
 
   /**
-   * @notice Set delegator.
+   * @notice Set user.
    */
-  function _setDelegator(address delegatee, address delegator) internal {
+  function _setUser(address spender, address user) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((delegator)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((user)), _fieldLayout);
   }
 
   /**
-   * @notice Set delegator.
+   * @notice Set user.
    */
-  function set(address delegatee, address delegator) internal {
+  function set(address spender, address user) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((delegator)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((user)), _fieldLayout);
   }
 
   /**
-   * @notice Set delegator.
+   * @notice Set user.
    */
-  function _set(address delegatee, address delegator) internal {
+  function _set(address spender, address user) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((delegator)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((user)), _fieldLayout);
   }
 
   /**
    * @notice Delete all data for given keys.
    */
-  function deleteRecord(address delegatee) internal {
+  function deleteRecord(address spender) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
@@ -157,9 +157,9 @@ library Delegation {
   /**
    * @notice Delete all data for given keys.
    */
-  function _deleteRecord(address delegatee) internal {
+  function _deleteRecord(address spender) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
     StoreCore.deleteRecord(_tableId, _keyTuple, _fieldLayout);
   }
@@ -168,8 +168,8 @@ library Delegation {
    * @notice Tightly pack static (fixed length) data using this table's schema.
    * @return The static data, encoded into a sequence of bytes.
    */
-  function encodeStatic(address delegator) internal pure returns (bytes memory) {
-    return abi.encodePacked(delegator);
+  function encodeStatic(address user) internal pure returns (bytes memory) {
+    return abi.encodePacked(user);
   }
 
   /**
@@ -178,8 +178,8 @@ library Delegation {
    * @return The lengths of the dynamic fields (packed into a single bytes32 value).
    * @return The dynamic (variable length) data, encoded into a sequence of bytes.
    */
-  function encode(address delegator) internal pure returns (bytes memory, EncodedLengths, bytes memory) {
-    bytes memory _staticData = encodeStatic(delegator);
+  function encode(address user) internal pure returns (bytes memory, EncodedLengths, bytes memory) {
+    bytes memory _staticData = encodeStatic(user);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -190,9 +190,9 @@ library Delegation {
   /**
    * @notice Encode keys as a bytes32 array using this table's field layout.
    */
-  function encodeKeyTuple(address delegatee) internal pure returns (bytes32[] memory) {
+  function encodeKeyTuple(address spender) internal pure returns (bytes32[] memory) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(delegatee)));
+    _keyTuple[0] = bytes32(uint256(uint160(spender)));
 
     return _keyTuple;
   }
