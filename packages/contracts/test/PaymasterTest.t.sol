@@ -32,6 +32,7 @@ contract PaymasterTest is MudTest {
   SimpleAccount account;
 
   uint256 grantAllowance = 10 ether;
+  uint256 paymasterDeposit = 10 ether;
 
   function setUp() public override {
     super.setUp();
@@ -46,7 +47,7 @@ contract PaymasterTest is MudTest {
     grantor = payable(makeAddr("grantor"));
     account = accountFactory.createAccount(user, 0);
 
-    entryPoint.depositTo{ value: 10 ether }(address(paymaster));
+    entryPoint.depositTo{ value: paymasterDeposit }(address(paymaster));
 
     vm.prank(admin);
     paymaster.setGrantAllowance(grantor, grantAllowance);
@@ -122,8 +123,16 @@ contract PaymasterTest is MudTest {
     assertEq(Grantor.getAllowance(grantor), grantAllowance - requiredAllowance);
     assertEq(Allowance.get(address(account)), requiredAllowance);
 
+    // Expect the user op to succeed now and the balance to be taken from the user account
+    assertEq(beneficiary.balance, 0);
     submitUserOp(op);
-    assertLt(Allowance.get(address(account)), requiredAllowance);
+    uint256 feePaidByPaymaster = paymasterDeposit - entryPoint.balanceOf(address(paymaster));
+    uint256 feePaidByUser = requiredAllowance - Allowance.get(address(account));
+    assertGt(beneficiary.balance, 0);
+    assertEq(beneficiary.balance, feePaidByPaymaster);
+    assertGt(feePaidByUser, 0);
+    // The fee paid by the user doesn't include the `postOp` cost
+    assertLt(feePaidByUser, feePaidByPaymaster);
   }
 
   function testCallWithSpender() external {
@@ -163,8 +172,15 @@ contract PaymasterTest is MudTest {
     paymaster.registerSpender(address(account));
 
     // Expect the user op to succeed now and the balance to be taken from the user account
+    assertEq(beneficiary.balance, 0);
     submitUserOp(op);
-    assertLt(Allowance.get(address(user)), requiredAllowance);
+    uint256 feePaidByPaymaster = paymasterDeposit - entryPoint.balanceOf(address(paymaster));
+    uint256 feePaidByUser = requiredAllowance - Allowance.get(address(user));
+    assertGt(beneficiary.balance, 0);
+    assertEq(beneficiary.balance, feePaidByPaymaster);
+    assertGt(feePaidByUser, 0);
+    // The fee paid by the user doesn't include the `postOp` cost
+    assertLt(feePaidByUser, feePaidByPaymaster);
   }
 
   function fillUserOp(
