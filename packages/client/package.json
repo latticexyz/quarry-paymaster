@@ -12,6 +12,7 @@
   "author": "",
   "dependencies": {
     "@latticexyz/common": "2.2.9",
+    "@latticexyz/config": "^2.2.9",
     "@latticexyz/explorer": "2.2.9",
     "@latticexyz/protocol-parser": "2.2.9",
     "@latticexyz/schema-type": "2.2.9",
@@ -19,10 +20,17 @@
     "@latticexyz/store": "2.2.9",
     "@latticexyz/store-sync": "2.2.9",
     "@latticexyz/world": "2.2.9",
-    "contracts": "workspace:*"
+    "contracts": "workspace:*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
+    "@types/react": "18.2.22",
+    "@types/react-dom": "18.2.7",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint-plugin-react": "7.31.11",
+    "eslint-plugin-react-hooks": "4.6.0",
     "prettier": "3.2.5",
     "typescript": "5.4.2",
     "viem": "2.21.6",

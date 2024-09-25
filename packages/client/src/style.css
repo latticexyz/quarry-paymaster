@@ -1,0 +1,25 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.table {
+  width: 100vw;
+}
+
+.table,
+.td {
+  border: 1px solid black;
+}
+
+.table {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.td {
+  padding: 10px;
+  display: grid;
+  grid-gap: 5px;
+}
