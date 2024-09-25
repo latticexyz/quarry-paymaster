@@ -19,6 +19,25 @@ const config = defineWorld({
           },
           key: ["grantor"],
         },
+        PassHolder: {
+          schema: {
+            user: "address",
+            passId: "bytes32",
+            lastRenewed: "uint256",
+            lastClaimed: "uint256",
+          },
+          key: ["user", "passId"],
+        },
+        PassConfig: {
+          schema: {
+            passId: "bytes32",
+            claimAmount: "uint256",
+            claimInterval: "uint256",
+            validityPeriod: "uint256",
+            grantor: "address",
+          },
+          key: ["passId"],
+        },
         Spender: {
           schema: {
             spender: "address",
