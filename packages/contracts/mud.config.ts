@@ -19,6 +19,13 @@ const config = defineWorld({
           },
           key: ["grantor"],
         },
+        Delegation: {
+          schema: {
+            delegatee: "address",
+            delegator: "address",
+          },
+          key: ["delegatee"],
+        },
       },
     },
     world: {

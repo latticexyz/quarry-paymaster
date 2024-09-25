@@ -7,11 +7,21 @@ import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/P
 import { System } from "@latticexyz/world/src/System.sol";
 import { SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccount.sol";
 import { IWorldCall } from "@latticexyz/world/src/IWorldKernel.sol";
-import { Delegation } from "@latticexyz/world/src/Delegation.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IStore } from "@latticexyz/store/src/IStore.sol";
+import { Unstable_CallWithSignatureSystem } from "@latticexyz/world-modules/src/modules/callwithsignature/Unstable_CallWithSignatureModule.sol";
+import { validateCallWithSignature } from "@latticexyz/world-modules/src/modules/callwithsignature/validateCallWithSignature.sol";
 
 import { Allowance } from "../codegen/tables/Allowance.sol";
+import { Delegation } from "../codegen/tables/Delegation.sol";
+
+/**
+ * TODO:
+ * - There is a griefing attack vector in which Alice declares a delegation for Bob,
+ *   but Alice doesn't have an allowance, so now if Bob wants to send a user operation
+ *   it fails because only Alice's balance is checked. To prevent this, we should prevent
+ *   registering a delegation for a spender that already has a delegation, and set the user as its own spender
+ */
 
 contract PaymasterSystem is System, IPaymaster {
   using SimpleAccountUserOperationLib for PackedUserOperation;
@@ -41,7 +51,7 @@ contract PaymasterSystem is System, IPaymaster {
     uint256 maxCost
   ) public override returns (bytes memory context, uint256 validationData) {
     // TODO: verify the call is coming from the entry point contract
-    address user = userOp.sender;
+    address user = _getUser(userOp);
     uint256 availableAllowance = Allowance._get(user);
 
     if (availableAllowance < maxCost) {
@@ -78,6 +88,54 @@ contract PaymasterSystem is System, IPaymaster {
     // Refund the unused cost
     uint256 currentAllowance = Allowance._get(user);
     Allowance._set(user, currentAllowance + maxCost - actualGasCost);
+  }
+
+  function _getUser(PackedUserOperation calldata userOp) internal view returns (address user) {
+    // Check if there is an active delegation for this account
+    address delegator = Delegation.getDelegator(userOp.sender);
+    if (delegator != address(0)) {
+      return delegator;
+    }
+
+    // Check if this is a call to register a new delegation via `callWithSignature`
+    delegator = _recoverCallWithSignature(userOp);
+    if (delegator != address(0)) {
+      return delegator;
+    }
+
+    return userOp.sender;
+  }
+
+  /**
+   * Recover the signer from a `callWithSignature` to this paymaster
+   */
+  function _recoverCallWithSignature(PackedUserOperation calldata userOp) internal view returns (address) {
+    // Require this to be a call to the smart account's `execute` function
+    if (!userOp.isExecuteCall()) {
+      return address(0);
+    }
+
+    // Require the target of this `execute` call to be this contract
+    if (userOp.getExecuteDestination() != _world()) {
+      return address(0);
+    }
+
+    // Extract the function payload from the `execute` call
+    bytes calldata executeCallData = userOp.getExecuteCallData();
+
+    // Require the target of this `execute` call to be `callWithSignature`
+    if (getFunctionSelector(executeCallData) != Unstable_CallWithSignatureSystem.callWithSignature.selector) {
+      return address(0);
+    }
+
+    // Validate the signature
+    (address signer, ResourceId systemId, bytes memory callData, bytes memory signature) = abi.decode(
+      getArguments(executeCallData),
+      (address, ResourceId, bytes, bytes)
+    );
+    validateCallWithSignature(signer, systemId, callData, signature);
+
+    return signer;
   }
 }
 
