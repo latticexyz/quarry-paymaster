@@ -17,10 +17,10 @@
   },
   "dependencies": {
     "@latticexyz/cli": "link:../../../mud/packages/cli",
-    "@latticexyz/schema-type": "2.2.8",
-    "@latticexyz/store": "2.2.8",
-    "@latticexyz/world": "2.2.8",
-    "@latticexyz/world-modules": "2.2.8"
+    "@latticexyz/schema-type": "2.2.9",
+    "@latticexyz/store": "2.2.9",
+    "@latticexyz/world": "2.2.9",
+    "@latticexyz/world-modules": "2.2.9"
   },
   "devDependencies": {
     "@account-abstraction/contracts": "^0.7.0",
@@ -31,7 +31,7 @@
     "prettier": "3.2.5",
     "prettier-plugin-solidity": "1.3.1",
     "solhint": "^3.3.7",
-    "solhint-config-mud": "2.2.8",
-    "solhint-plugin-mud": "2.2.8"
+    "solhint-config-mud": "2.2.9",
+    "solhint-plugin-mud": "2.2.9"
   }
 }
