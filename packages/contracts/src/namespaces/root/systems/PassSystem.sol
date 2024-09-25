@@ -69,7 +69,7 @@ contract PassSystem is System {
     }
 
     // Require the last claim to have been before the claimInterval
-    if (block.timestamp - passHolder.lastClaimed < passConfig.claimInterval) {
+    if (block.timestamp - passHolder.lastClaimed <= passConfig.claimInterval) {
       revert PassSystem_PendingCooldown(passId, passConfig.claimInterval, user, passHolder.lastClaimed);
     }
 
