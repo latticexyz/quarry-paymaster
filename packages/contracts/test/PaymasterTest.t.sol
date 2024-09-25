@@ -11,8 +11,8 @@ import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/Mes
 import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
 
 import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.sol";
-import { ComputeUnits } from "../src/namespaces/root/codegen/tables/ComputeUnits.sol";
-import { ComputeUnitManager } from "../src/namespaces/root/codegen/tables/ComputeUnitManager.sol";
+import { Allowance } from "../src/namespaces/root/codegen/tables/Allowance.sol";
+import { Grantor } from "../src/namespaces/root/codegen/tables/Grantor.sol";
 import { NamespaceOwner } from "../src/namespaces/world/codegen/tables/NamespaceOwner.sol";
 import { TestCounter } from "./utils/TestCounter.sol";
 import { IWorld } from "../src/codegen/world/IWorld.sol";
@@ -26,11 +26,11 @@ contract PaymasterTest is MudTest {
   address payable beneficiary;
   address user;
   address admin;
-  address computeUnitManager;
+  address grantor;
   uint256 userKey;
   SimpleAccount account;
 
-  uint256 initialManagerAllowance = 10 ether;
+  uint256 grantAllowance = 10 ether;
 
   function setUp() public override {
     super.setUp();
@@ -42,13 +42,13 @@ contract PaymasterTest is MudTest {
     beneficiary = payable(makeAddr("beneficiary"));
     (user, userKey) = makeAddrAndKey("user");
     admin = NamespaceOwner.get(paymaster, ROOT_NAMESPACE_ID);
-    computeUnitManager = payable(makeAddr("computeUnitManager"));
+    grantor = payable(makeAddr("grantor"));
     account = accountFactory.createAccount(user, 0);
 
     entryPoint.depositTo{ value: 10 ether }(address(paymaster));
 
     vm.prank(admin);
-    paymaster.setComputeUnitManagerAllowance(computeUnitManager, initialManagerAllowance);
+    paymaster.setGrantAllowance(grantor, grantAllowance);
   }
 
   function testWorldExists() public {
@@ -88,7 +88,7 @@ contract PaymasterTest is MudTest {
     op.signature = signUserOp(op, userKey);
 
     expectUserOpRevert(
-      abi.encodeWithSelector(PaymasterSystem.InsufficientComputeUnits.selector, uint256(0), uint256(380000000000000))
+      abi.encodeWithSelector(PaymasterSystem.InsufficientAllowance.selector, uint256(0), uint256(380000000000000))
     );
     submitUserOp(op);
   }
@@ -107,14 +107,14 @@ contract PaymasterTest is MudTest {
     op.signature = signUserOp(op, userKey);
 
     // Grant sufficient computation units for the account
-    uint256 requiredUnits = 380000000000000;
-    vm.prank(computeUnitManager);
-    paymaster.addComputeUnits(address(account), requiredUnits);
-    assertEq(ComputeUnitManager.getAllowance(computeUnitManager), initialManagerAllowance - requiredUnits);
-    assertEq(ComputeUnits.get(address(account)), requiredUnits);
+    uint256 requiredAllowance = 380000000000000;
+    vm.prank(grantor);
+    paymaster.grantAllowance(address(account), requiredAllowance);
+    assertEq(Grantor.getAllowance(grantor), grantAllowance - requiredAllowance);
+    assertEq(Allowance.get(address(account)), requiredAllowance);
 
     submitUserOp(op);
-    assertLt(ComputeUnits.get(address(account)), requiredUnits);
+    assertLt(Allowance.get(address(account)), requiredAllowance);
   }
 
   function testCallFromWithPaymaster() external {

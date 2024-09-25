@@ -16,9 +16,9 @@ import { Schema } from "@latticexyz/store/src/Schema.sol";
 import { EncodedLengths, EncodedLengthsLib } from "@latticexyz/store/src/EncodedLengths.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 
-library ComputeUnits {
-  // Hex below is the result of `WorldResourceIdLib.encode({ namespace: "", name: "ComputeUnits", typeId: RESOURCE_TABLE });`
-  ResourceId constant _tableId = ResourceId.wrap(0x74620000000000000000000000000000436f6d70757465556e69747300000000);
+library Grantor {
+  // Hex below is the result of `WorldResourceIdLib.encode({ namespace: "", name: "Grantor", typeId: RESOURCE_TABLE });`
+  ResourceId constant _tableId = ResourceId.wrap(0x746200000000000000000000000000004772616e746f72000000000000000000);
 
   FieldLayout constant _fieldLayout =
     FieldLayout.wrap(0x0020010020000000000000000000000000000000000000000000000000000000);
@@ -34,7 +34,7 @@ library ComputeUnits {
    */
   function getKeyNames() internal pure returns (string[] memory keyNames) {
     keyNames = new string[](1);
-    keyNames[0] = "user";
+    keyNames[0] = "grantor";
   }
 
   /**
@@ -43,7 +43,7 @@ library ComputeUnits {
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
     fieldNames = new string[](1);
-    fieldNames[0] = "units";
+    fieldNames[0] = "allowance";
   }
 
   /**
@@ -61,95 +61,95 @@ library ComputeUnits {
   }
 
   /**
-   * @notice Get units.
+   * @notice Get allowance.
    */
-  function getUnits(address user) internal view returns (uint256 units) {
+  function getAllowance(address grantor) internal view returns (uint256 allowance) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (uint256(bytes32(_blob)));
   }
 
   /**
-   * @notice Get units.
+   * @notice Get allowance.
    */
-  function _getUnits(address user) internal view returns (uint256 units) {
+  function _getAllowance(address grantor) internal view returns (uint256 allowance) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (uint256(bytes32(_blob)));
   }
 
   /**
-   * @notice Get units.
+   * @notice Get allowance.
    */
-  function get(address user) internal view returns (uint256 units) {
+  function get(address grantor) internal view returns (uint256 allowance) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (uint256(bytes32(_blob)));
   }
 
   /**
-   * @notice Get units.
+   * @notice Get allowance.
    */
-  function _get(address user) internal view returns (uint256 units) {
+  function _get(address grantor) internal view returns (uint256 allowance) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (uint256(bytes32(_blob)));
   }
 
   /**
-   * @notice Set units.
+   * @notice Set allowance.
    */
-  function setUnits(address user, uint256 units) internal {
+  function setAllowance(address grantor, uint256 allowance) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((units)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((allowance)), _fieldLayout);
   }
 
   /**
-   * @notice Set units.
+   * @notice Set allowance.
    */
-  function _setUnits(address user, uint256 units) internal {
+  function _setAllowance(address grantor, uint256 allowance) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((units)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((allowance)), _fieldLayout);
   }
 
   /**
-   * @notice Set units.
+   * @notice Set allowance.
    */
-  function set(address user, uint256 units) internal {
+  function set(address grantor, uint256 allowance) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((units)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((allowance)), _fieldLayout);
   }
 
   /**
-   * @notice Set units.
+   * @notice Set allowance.
    */
-  function _set(address user, uint256 units) internal {
+  function _set(address grantor, uint256 allowance) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((units)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((allowance)), _fieldLayout);
   }
 
   /**
    * @notice Delete all data for given keys.
    */
-  function deleteRecord(address user) internal {
+  function deleteRecord(address grantor) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
@@ -157,9 +157,9 @@ library ComputeUnits {
   /**
    * @notice Delete all data for given keys.
    */
-  function _deleteRecord(address user) internal {
+  function _deleteRecord(address grantor) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
     StoreCore.deleteRecord(_tableId, _keyTuple, _fieldLayout);
   }
@@ -168,8 +168,8 @@ library ComputeUnits {
    * @notice Tightly pack static (fixed length) data using this table's schema.
    * @return The static data, encoded into a sequence of bytes.
    */
-  function encodeStatic(uint256 units) internal pure returns (bytes memory) {
-    return abi.encodePacked(units);
+  function encodeStatic(uint256 allowance) internal pure returns (bytes memory) {
+    return abi.encodePacked(allowance);
   }
 
   /**
@@ -178,8 +178,8 @@ library ComputeUnits {
    * @return The lengths of the dynamic fields (packed into a single bytes32 value).
    * @return The dynamic (variable length) data, encoded into a sequence of bytes.
    */
-  function encode(uint256 units) internal pure returns (bytes memory, EncodedLengths, bytes memory) {
-    bytes memory _staticData = encodeStatic(units);
+  function encode(uint256 allowance) internal pure returns (bytes memory, EncodedLengths, bytes memory) {
+    bytes memory _staticData = encodeStatic(allowance);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -190,9 +190,9 @@ library ComputeUnits {
   /**
    * @notice Encode keys as a bytes32 array using this table's field layout.
    */
-  function encodeKeyTuple(address user) internal pure returns (bytes32[] memory) {
+  function encodeKeyTuple(address grantor) internal pure returns (bytes32[] memory) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[0] = bytes32(uint256(uint160(grantor)));
 
     return _keyTuple;
   }

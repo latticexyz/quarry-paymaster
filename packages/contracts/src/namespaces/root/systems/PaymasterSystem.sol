@@ -11,12 +11,11 @@ import { Delegation } from "@latticexyz/world/src/Delegation.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IStore } from "@latticexyz/store/src/IStore.sol";
 
-import { ComputeUnits } from "../codegen/tables/ComputeUnits.sol";
-import { UserDelegationControl } from "../../world/codegen/tables/UserDelegationControl.sol";
+import { Allowance } from "../codegen/tables/Allowance.sol";
 
 contract PaymasterSystem is System, IPaymaster {
   using SimpleAccountUserOperationLib for PackedUserOperation;
-  error InsufficientComputeUnits(uint256 available, uint256 required);
+  error InsufficientAllowance(uint256 available, uint256 required);
 
   /**
    * Payment validation: check if paymaster agrees to pay.
@@ -42,14 +41,16 @@ contract PaymasterSystem is System, IPaymaster {
     uint256 maxCost
   ) public override returns (bytes memory context, uint256 validationData) {
     // TODO: verify the call is coming from the entry point contract
-    address from = _getFromAddress(userOp);
-    uint256 availableComputeUnits = ComputeUnits._get(from);
+    address user = userOp.sender;
+    uint256 availableAllowance = Allowance._get(user);
 
-    if (availableComputeUnits < maxCost) {
-      revert InsufficientComputeUnits(availableComputeUnits, maxCost);
+    if (availableAllowance < maxCost) {
+      revert InsufficientAllowance(availableAllowance, maxCost);
     }
 
-    context = abi.encode(from);
+    Allowance._set(user, availableAllowance - maxCost);
+
+    context = abi.encode(user, maxCost);
   }
 
   /**
@@ -72,54 +73,11 @@ contract PaymasterSystem is System, IPaymaster {
     uint256 actualUserOpFeePerGas
   ) public override {
     // TODO: verify the call is coming from the entry point contract
+    (address user, uint256 maxCost) = abi.decode(context, (address, uint256));
 
-    address from = abi.decode(context, (address));
-
-    // Deduct the gas cost from the user's compute units
-    ComputeUnits._set(from, ComputeUnits._get(from) - actualGasCost);
-  }
-
-  /**
-   * If this is a call to `callFrom`, extract the delegator and validate the delegation
-   */
-  function _getFromAddress(PackedUserOperation calldata userOp) internal returns (address) {
-    // Early return if this is not a call to the simple smart account's execute function
-    if (!userOp.isExecuteCall()) {
-      return userOp.sender;
-    }
-
-    // Early return the target is not a World's callFrom function
-    bytes calldata callData = userOp.getExecuteCallData();
-    if (getFunctionSelector(callData) != IWorldCall.callFrom.selector) {
-      return userOp.sender;
-    }
-
-    // Validate the delegation
-    address target = userOp.getExecuteDestination();
-    // TODO: would this be more efficient if we read directly from the calldata instead of abi.decode?
-    (address from, ResourceId systemId, bytes memory systemCallData) = abi.decode(
-      callData,
-      (address, ResourceId, bytes)
-    );
-    ResourceId delegation = UserDelegationControl.get({
-      _store: IStore(target),
-      delegator: from,
-      delegatee: userOp.sender
-    });
-    bool isValidDelegation = Delegation.verify({
-      delegationControlId: delegation,
-      delegator: from,
-      delegatee: userOp.sender,
-      systemId: systemId,
-      callData: systemCallData
-    });
-
-    // If this is a valid `callFrom` call, use the delegator's compute units
-    if (isValidDelegation) {
-      return from;
-    }
-
-    return userOp.sender;
+    // Refund the unused cost
+    uint256 currentAllowance = Allowance._get(user);
+    Allowance._set(user, currentAllowance + maxCost - actualGasCost);
   }
 }
 

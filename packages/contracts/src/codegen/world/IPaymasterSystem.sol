@@ -12,7 +12,7 @@ import { IPaymaster } from "@account-abstraction/contracts/interfaces/IPaymaster
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IPaymasterSystem {
-  error InsufficientComputeUnits(uint256 available, uint256 required);
+  error InsufficientAllowance(uint256 available, uint256 required);
 
   function validatePaymasterUserOp(
     PackedUserOperation calldata userOp,

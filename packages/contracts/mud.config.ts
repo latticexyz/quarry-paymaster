@@ -5,19 +5,19 @@ const config = defineWorld({
     root: {
       namespace: "",
       tables: {
-        ComputeUnits: {
+        Allowance: {
           schema: {
             user: "address",
-            units: "uint256",
+            allowance: "uint256",
           },
           key: ["user"],
         },
-        ComputeUnitManager: {
+        Grantor: {
           schema: {
-            account: "address",
+            grantor: "address",
             allowance: "uint256",
           },
-          key: ["account"],
+          key: ["grantor"],
         },
       },
     },
@@ -29,20 +29,6 @@ const config = defineWorld({
             owner: "address",
           },
           key: ["namespaceId"],
-          deploy: {
-            disabled: true,
-          },
-          codegen: {
-            storeArgument: true,
-          },
-        },
-        UserDelegationControl: {
-          schema: {
-            delegator: "address",
-            delegatee: "address",
-            delegationControlId: "ResourceId",
-          },
-          key: ["delegator", "delegatee"],
           deploy: {
             disabled: true,
           },
