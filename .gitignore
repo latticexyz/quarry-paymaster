@@ -1,4 +1,5 @@
 node_modules
+*.log
 
 # mud artifacts
 .mud
