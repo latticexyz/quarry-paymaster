@@ -4,6 +4,7 @@ import { waitForTransactionReceipt, writeContract } from "viem/actions";
 import { paymaster } from "./contract";
 import { Address, Hex } from "viem";
 import { resourceToHex } from "@latticexyz/common";
+import { sendUserOperation } from "viem/account-abstraction";
 
 export async function setGrantAllowance(amount: bigint) {
   const txHash = await getAction(
@@ -91,17 +92,38 @@ export async function claim(passId: Hex, receiver: Address) {
 }
 
 export async function registerNamespace(namespace: string) {
-  const txHash = await getAction(
+  // const txHash = await getAction(
+  //   smartAccountClient,
+  //   writeContract,
+  //   "writeContract",
+  // )({
+  //   ...paymaster,
+  //   account: smartAccountClient.account,
+  //   functionName: "registerNamespace",
+  //   args: [resourceToHex({ type: "namespace", namespace, name: "" })],
+  //   preVerificationGas: 1_000_000,
+  //   verificationGas: 1_000_000,
+  // });
+
+  // const receipt = await waitForTransactionReceipt(publicClient, { hash: txHash });
+
+  const result = await getAction(
     smartAccountClient,
-    writeContract,
-    "writeContract",
+    sendUserOperation,
+    "sendUserOperation",
   )({
-    ...paymaster,
-    account: smartAccountClient.account,
-    functionName: "registerNamespace",
-    args: [resourceToHex({ type: "namespace", namespace, name: "" })],
+    calls: [
+      {
+        abi: paymaster.abi,
+        to: paymaster.address,
+        functionName: "registerNamespace",
+        args: [resourceToHex({ type: "namespace", namespace, name: "" })],
+      },
+    ],
+    preVerificationGas: 100_000n,
+    verificationGasLimit: 1_000_000n,
+    callGasLimit: 1_000_000n,
   });
 
-  const receipt = await waitForTransactionReceipt(publicClient, { hash: txHash });
-  console.log("Register namespace", receipt);
+  console.log("Register namespace", result);
 }

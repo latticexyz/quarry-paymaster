@@ -2,7 +2,7 @@
 pragma solidity >=0.8.24;
 
 import { WorldContextConsumerLib } from "@latticexyz/world/src/WorldContext.sol";
-import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
+import { UserOperation } from "@account-abstraction/contracts/interfaces/UserOperation.sol";
 import { Unstable_CallWithSignatureSystem } from "@latticexyz/world-modules/src/modules/callwithsignature/Unstable_CallWithSignatureModule.sol";
 import { validateCallWithSignature } from "@latticexyz/world-modules/src/modules/callwithsignature/validateCallWithSignature.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
@@ -11,7 +11,7 @@ import { SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAcco
 /**
  * Recover the signer from a `callWithSignature` to this paymaster
  */
-function recoverCallWithSignature(PackedUserOperation calldata userOp) view returns (address) {
+function recoverCallWithSignature(UserOperation calldata userOp) view returns (address) {
   // Require this to be a call to the smart account's `execute` function
   if (!isSimpleAccountExecuteCall(userOp)) {
     return address(0);
@@ -40,15 +40,15 @@ function recoverCallWithSignature(PackedUserOperation calldata userOp) view retu
   return signer;
 }
 
-function isSimpleAccountExecuteCall(PackedUserOperation calldata op) pure returns (bool) {
+function isSimpleAccountExecuteCall(UserOperation calldata op) pure returns (bool) {
   return getFunctionSelector(op.callData) == SimpleAccount.execute.selector;
 }
 
-function getExecuteDestination(PackedUserOperation calldata op) pure returns (address) {
+function getExecuteDestination(UserOperation calldata op) pure returns (address) {
   return address(uint160(uint256(bytes32(getArguments(op.callData)[0:32]))));
 }
 
-function getExecuteCallData(PackedUserOperation calldata op) pure returns (bytes calldata) {
+function getExecuteCallData(UserOperation calldata op) pure returns (bytes calldata) {
   // destination (32B) | value (32B) | first encoding length (32B) | second encoding length (32B) | call data bytes
   return getArguments(op.callData)[128:];
 }
