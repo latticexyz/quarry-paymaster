@@ -57,9 +57,10 @@ export const userClient = createWalletClient({
 
 const smartAccount = await toSimpleSmartAccount({
   client: publicClient,
-  entryPoint: { address: entryPoint07Address, version: "0.7" },
-  // entryPoint: { address: entryPoint06Address, version: "0.6" },
-  factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
+  // entryPoint: { address: entryPoint07Address, version: "0.7" },
+  entryPoint: { address: entryPoint06Address, version: "0.6" },
+  // factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
+  factoryAddress: "0x9406Cc6185a346906296840746125a0E44976454",
   owner: createBurnerAccount(userKey),
 });
 
@@ -70,8 +71,8 @@ export const smartAccountClient = createBundlerClient({
   transport: http("http://localhost:4337"),
   paymaster: {
     async getPaymasterData() {
-      return { paymaster: paymasterAddress as Hex, paymasterData: "0x" };
-      // return { paymasterAndData: paymasterAddress as Hex };
+      // return { paymaster: paymasterAddress as Hex, paymasterData: "0x" };
+      return { paymasterAndData: paymasterAddress as Hex };
     },
   },
 }).extend(smartAccountActions());

@@ -2,7 +2,7 @@
 pragma solidity >=0.8.24;
 
 import { IPaymaster } from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
-import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
+import { UserOperation } from "@account-abstraction/contracts/interfaces/UserOperation.sol";
 import { System } from "@latticexyz/world/src/System.sol";
 
 import { Allowance } from "../codegen/tables/Allowance.sol";
@@ -33,7 +33,7 @@ contract PaymasterSystem is System, IPaymaster {
    *                          Note that the validation code cannot use block.timestamp (or block.number) directly.
    */
   function validatePaymasterUserOp(
-    PackedUserOperation calldata userOp,
+    UserOperation calldata userOp,
     bytes32 userOpHash,
     uint256 maxCost
   ) public override returns (bytes memory context, uint256 validationData) {
@@ -60,16 +60,8 @@ contract PaymasterSystem is System, IPaymaster {
    *                        postOpReverted - never passed in a call to postOp().
    * @param context       - The context value returned by validatePaymasterUserOp
    * @param actualGasCost - Actual gas used so far (without this postOp call).
-   * @param actualUserOpFeePerGas - the gas price this UserOp pays. This value is based on the UserOp's maxFeePerGas
-   *                        and maxPriorityFee (and basefee)
-   *                        It is not the same as tx.gasprice, which is what the bundler pays.
    */
-  function postOp(
-    IPaymaster.PostOpMode mode,
-    bytes calldata context,
-    uint256 actualGasCost,
-    uint256 actualUserOpFeePerGas
-  ) public override {
+  function postOp(IPaymaster.PostOpMode mode, bytes calldata context, uint256 actualGasCost) public override {
     _requireFromEntryPoint();
 
     (address user, uint256 maxCost) = abi.decode(context, (address, uint256));
@@ -83,7 +75,7 @@ contract PaymasterSystem is System, IPaymaster {
    * If this user op is sent from a spender account, translate it to the user account.
    * Else return the userOp sender.
    */
-  function _getUser(PackedUserOperation calldata userOp) internal view returns (address) {
+  function _getUser(UserOperation calldata userOp) internal view returns (address) {
     // Check if this is a spender account
     address user = Spender.getUser(userOp.sender);
     if (user != address(0)) {
