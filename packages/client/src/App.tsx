@@ -8,6 +8,7 @@ import { stash } from "./stash";
 import { getRecord } from "./getRecord";
 import config from "contracts/mud.config";
 import { setGrantAllowance, grantAllowance, registerPass, claim, issuePass, registerNamespace } from "./actions";
+import { hexToResource } from "@latticexyz/common";
 
 const tables = config.namespaces.root.tables;
 const passId = padHex("0x01", { size: 32, dir: "right" });
@@ -59,6 +60,8 @@ export const App = () => {
         ?.lastRenewed,
   );
 
+  const namespaceOwners = useStash(stash, (state) => state.records.world.NamespaceOwner);
+
   return (
     <>
       <div className="table">
@@ -97,6 +100,14 @@ export const App = () => {
           <input placeholder="namespace" value={namespace} onChange={(e) => setNamespace(e.target.value)}></input>
           <button onClick={() => registerNamespace(namespace)}>Register new namespace</button>
         </div>
+      </div>
+      <div>
+        Namespaces:
+        <ul>
+          {Object.values(namespaceOwners).map((namespaceOwner) => (
+            <li>{hexToResource(namespaceOwner.namespaceId).namespace}</li>
+          ))}
+        </ul>
       </div>
     </>
   );

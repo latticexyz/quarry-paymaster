@@ -11,9 +11,6 @@ procs:
   explorer:
     cwd: packages/contracts
     shell: pnpm explorer
-  aa-contracts:
-    cwd: ../alto
-    shell: pnpm ts-node scripts/localDeployer/index.ts
   bundler:
     cwd: ../alto
-    shell: ./alto --config ../quarry-paymaster/alto.config.json
+    shell: pnpm ts-node scripts/localDeployer/index.ts && ./alto --config ../quarry-paymaster/alto.config.json

@@ -16,15 +16,16 @@ contract PostDeploy is Script {
 
     // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-    IEntryPoint entryPoint = IEntryPoint(0x0000000071727De22E5E9d8BAf0edAc6f37da032);
+    IEntryPoint entryPoint07 = IEntryPoint(0x0000000071727De22E5E9d8BAf0edAc6f37da032);
+    IEntryPoint entryPoint06 = IEntryPoint(0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789);
 
     // Start broadcasting transactions from the deployer account
     vm.startBroadcast(deployerPrivateKey);
 
-    SystemConfig.set(address(entryPoint));
+    SystemConfig.set(address(entryPoint07));
 
     // TODO: only for dev, remove in prod
-    entryPoint.depositTo{ value: 1 ether }(worldAddress);
+    entryPoint07.depositTo{ value: 1 ether }(worldAddress);
 
     vm.stopBroadcast();
   }

@@ -1,6 +1,7 @@
 import { Stash, State, StoreConfig, subscribeStore } from "@latticexyz/stash/internal";
 import { useEffect, useRef, useState } from "react";
 
+// TODO: move to @latticexyz/stash
 export function useStash<config extends StoreConfig, T>(
   stash: Stash<config>,
   selector: (stash: State<config>) => T,
@@ -17,9 +18,6 @@ export function useStash<config extends StoreConfig, T>(
         forceUpdate({});
       }
     }
-    // we sync state immediately in case selector changed
-    // TODO: add option `subscribeStore` to emit immediately
-    syncState();
     return subscribeStore({ stash, subscriber: syncState });
   }, [equals, selector, stash]);
 

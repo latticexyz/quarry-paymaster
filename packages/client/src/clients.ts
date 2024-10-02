@@ -7,21 +7,12 @@ import {
   ClientConfig,
   PublicClient,
   Hex,
-  HttpTransport,
-  Chain,
-  BundlerRpcSchema,
 } from "viem";
 import { anvil } from "viem/chains";
 import { createBurnerAccount } from "@latticexyz/common";
 import { transactionQueue } from "@latticexyz/common/actions";
 import { observer } from "@latticexyz/explorer/observer";
-import {
-  BundlerClient,
-  createBundlerClient,
-  entryPoint06Address,
-  entryPoint07Abi,
-  entryPoint07Address,
-} from "viem/account-abstraction";
+import { createBundlerClient, entryPoint06Address, entryPoint07Address } from "viem/account-abstraction";
 import { smartAccountActions } from "permissionless";
 import { worldAddress as paymasterAddress } from "contracts/deploys/31337/latest.json";
 import { toSimpleSmartAccount } from "permissionless/accounts";
@@ -67,6 +58,7 @@ export const userClient = createWalletClient({
 const smartAccount = await toSimpleSmartAccount({
   client: publicClient,
   entryPoint: { address: entryPoint07Address, version: "0.7" },
+  // entryPoint: { address: entryPoint06Address, version: "0.6" },
   factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
   owner: createBurnerAccount(userKey),
 });
