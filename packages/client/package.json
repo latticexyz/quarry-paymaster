@@ -11,18 +11,20 @@
   },
   "author": "",
   "dependencies": {
-    "@latticexyz/common": "2.2.9",
-    "@latticexyz/config": "^2.2.9",
-    "@latticexyz/explorer": "2.2.9",
-    "@latticexyz/protocol-parser": "2.2.9",
-    "@latticexyz/schema-type": "2.2.9",
-    "@latticexyz/stash": "2.2.9",
-    "@latticexyz/store": "2.2.9",
-    "@latticexyz/store-sync": "2.2.9",
-    "@latticexyz/world": "2.2.9",
+    "@latticexyz/common": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/config": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/explorer": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/protocol-parser": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/schema-type": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/stash": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/store": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/store-sync": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/world": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
     "contracts": "workspace:*",
+    "permissionless": "^0.2.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "viem": "2.21.6"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
@@ -33,7 +35,6 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "prettier": "3.2.5",
     "typescript": "5.4.2",
-    "viem": "2.21.6",
     "vite": "^5.4.6"
   }
 }

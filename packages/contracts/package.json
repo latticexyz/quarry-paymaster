@@ -16,11 +16,11 @@
     "test": "tsc --noEmit && mud test"
   },
   "dependencies": {
-    "@latticexyz/cli": "link:../../../mud/packages/cli",
-    "@latticexyz/schema-type": "2.2.9",
-    "@latticexyz/store": "2.2.9",
-    "@latticexyz/world": "2.2.9",
-    "@latticexyz/world-modules": "2.2.9"
+    "@latticexyz/cli": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/schema-type": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/store": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/world": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "@latticexyz/world-modules": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a"
   },
   "devDependencies": {
     "@account-abstraction/contracts": "^0.7.0",
@@ -31,7 +31,7 @@
     "prettier": "3.2.5",
     "prettier-plugin-solidity": "1.3.1",
     "solhint": "^3.3.7",
-    "solhint-config-mud": "2.2.9",
-    "solhint-plugin-mud": "2.2.9"
+    "solhint-config-mud": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
+    "solhint-plugin-mud": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a"
   }
 }

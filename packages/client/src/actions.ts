@@ -1,8 +1,9 @@
-import { formatEther, getAction, padHex, parseEther } from "viem/utils";
-import { adminClient, grantorClient, publicClient, userClient } from "./clients";
+import { getAction, parseEther } from "viem/utils";
+import { adminClient, grantorClient, publicClient, smartAccountClient, userClient } from "./clients";
 import { waitForTransactionReceipt, writeContract } from "viem/actions";
 import { paymaster } from "./contract";
-import { Hex } from "viem";
+import { Address, Hex } from "viem";
+import { resourceToHex } from "@latticexyz/common";
 
 export async function setGrantAllowance(amount: bigint) {
   const txHash = await getAction(
@@ -20,7 +21,7 @@ export async function setGrantAllowance(amount: bigint) {
   console.log("Set grant allowance", receipt);
 }
 
-export async function grantAllowance(amount: bigint) {
+export async function grantAllowance(amount: bigint, receiver: Address) {
   const txHash = await getAction(
     grantorClient,
     writeContract,
@@ -29,7 +30,7 @@ export async function grantAllowance(amount: bigint) {
     ...paymaster,
     account: grantorClient.account,
     functionName: "grantAllowance",
-    args: [userClient.account.address, amount],
+    args: [receiver, amount],
   });
 
   const receipt = await waitForTransactionReceipt(publicClient, { hash: txHash });
@@ -56,7 +57,7 @@ export async function registerPass(passId: Hex) {
   console.log("Register pass", receipt);
 }
 
-export async function issuePass(passId: Hex) {
+export async function issuePass(passId: Hex, receiver: Address) {
   const txHash = await getAction(
     grantorClient,
     writeContract,
@@ -65,14 +66,14 @@ export async function issuePass(passId: Hex) {
     ...paymaster,
     account: grantorClient.account,
     functionName: "issuePass",
-    args: [passId, userClient.account.address],
+    args: [passId, receiver],
   });
 
   const receipt = await waitForTransactionReceipt(publicClient, { hash: txHash });
   console.log("Issue pass", receipt);
 }
 
-export async function claim(passId: Hex) {
+export async function claim(passId: Hex, receiver: Address) {
   const txHash = await getAction(
     grantorClient,
     writeContract,
@@ -82,9 +83,25 @@ export async function claim(passId: Hex) {
     // TODO: change to user client once smart account is set up
     account: grantorClient.account,
     functionName: "claimFor",
-    args: [userClient.account.address, passId],
+    args: [receiver, passId],
   });
 
   const receipt = await waitForTransactionReceipt(publicClient, { hash: txHash });
   console.log("Claim", receipt);
+}
+
+export async function registerNamespace(namespace: string) {
+  const txHash = await getAction(
+    smartAccountClient,
+    writeContract,
+    "writeContract",
+  )({
+    ...paymaster,
+    account: smartAccountClient.account,
+    functionName: "registerNamespace",
+    args: [resourceToHex({ type: "namespace", namespace, name: "" })],
+  });
+
+  const receipt = await waitForTransactionReceipt(publicClient, { hash: txHash });
+  console.log("Register namespace", receipt);
 }
