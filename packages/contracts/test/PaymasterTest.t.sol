@@ -7,7 +7,6 @@ import { getKeysWithValue } from "@latticexyz/world-modules/src/modules/keyswith
 import { EntryPoint, IEntryPoint } from "@account-abstraction/contracts/core/EntryPoint.sol";
 import { UserOperation } from "@account-abstraction/contracts/interfaces/UserOperation.sol";
 import { SimpleAccountFactory, SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccountFactory.sol";
-import { MessageHashUtils } from "./utils/MessageHashUtils.sol";
 import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
 import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOwner.sol";
 
@@ -206,8 +205,16 @@ contract PaymasterTest is MudTest {
 
   function signUserOp(UserOperation memory op, uint256 _key) internal view returns (bytes memory signature) {
     bytes32 hash = entryPoint.getUserOpHash(op);
-    (uint8 v, bytes32 r, bytes32 s) = vm.sign(_key, MessageHashUtils.toEthSignedMessageHash(hash));
+    (uint8 v, bytes32 r, bytes32 s) = vm.sign(_key, toEthSignedMessageHash(hash));
     signature = abi.encodePacked(r, s, v);
+  }
+
+  function toEthSignedMessageHash(bytes32 messageHash) internal pure returns (bytes32 digest) {
+    assembly ("memory-safe") {
+      mstore(0x00, "\x19Ethereum Signed Message:\n32") // 32 is the bytes-length of messageHash
+      mstore(0x1c, messageHash) // 0x1c (28) is the length of the prefix
+      digest := keccak256(0x00, 0x3c) // 0x3c is the length of the prefix (0x1c) + messageHash (0x20)
+    }
   }
 
   function submitUserOp(UserOperation memory op) internal {
