@@ -6,5 +6,6 @@
   "rpc-url": "http://0.0.0.0:8545",
   "port": 4337,
   "safe-mode": false,
-  "enable-instant-bundling-endpoint": true
+  "enable-instant-bundling-endpoint": true,
+  "min-executor-balance": "10000000000000000"
 }

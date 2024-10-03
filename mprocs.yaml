@@ -13,4 +13,8 @@ procs:
     shell: pnpm explorer
   bundler:
     cwd: ../alto
-    shell: pnpm ts-node scripts/localDeployer/index.ts && ./alto --config ../quarry-paymaster/alto.config.json
+    shell: pnpm ts-node scripts/localDeployer/index.ts &&
+      cd ../quarry-paymaster/packages/contracts &&
+      pnpm fund:paymaster:local &&
+      cd ../../../alto &&
+      ./alto --config ../quarry-paymaster/alto.config.json
