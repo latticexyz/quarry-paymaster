@@ -19,11 +19,11 @@
     "fund:paymaster:rhodolite": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url http://79.127.239.88:58545 -vvv"
   },
   "dependencies": {
-    "@latticexyz/cli": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
-    "@latticexyz/schema-type": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
-    "@latticexyz/store": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
-    "@latticexyz/world": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
-    "@latticexyz/world-modules": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a"
+    "@latticexyz/cli": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/schema-type": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/store": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/world": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/world-modules": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6"
   },
   "devDependencies": {
     "@account-abstraction/contracts": "^0.6.0",
@@ -34,7 +34,7 @@
     "prettier": "3.2.5",
     "prettier-plugin-solidity": "1.3.1",
     "solhint": "^3.3.7",
-    "solhint-config-mud": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a",
-    "solhint-plugin-mud": "2.2.11-main-111bb1b6c767a6f9654dde1a711d1db784f0770a"
+    "solhint-config-mud": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "solhint-plugin-mud": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6"
   }
 }

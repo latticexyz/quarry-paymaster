@@ -1,22 +1,13 @@
-import {
-  createPublicClient,
-  fallback,
-  webSocket,
-  http,
-  createWalletClient,
-  ClientConfig,
-  PublicClient,
-  Hex,
-  HttpTransport,
-} from "viem";
+import { createPublicClient, http, createWalletClient, ClientConfig, PublicClient, Hex, HttpTransport } from "viem";
 import { createBurnerAccount } from "@latticexyz/common";
 import { transactionQueue } from "@latticexyz/common/actions";
 import { observer } from "@latticexyz/explorer/observer";
 import { entryPoint06Address, SmartAccount } from "viem/account-abstraction";
-import { worldAddress as paymasterAddress } from "contracts/deploys/31337/latest.json";
 import { toSimpleSmartAccount } from "permissionless/accounts";
 import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { chain } from "./chain";
+import { paymaster } from "./contract";
+import { wiresaw } from "./wiresaw";
 
 // for demo - 1st and 2nd anvil key
 const adminKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
@@ -68,11 +59,11 @@ export const smartAccountClient: SmartAccountClient<HttpTransport, typeof chain,
     chain,
     account: smartAccount,
     client: publicClient,
-    bundlerTransport: http(chain.rpcUrls.erc4337.http[0]),
+    bundlerTransport: wiresaw(http(chain.rpcUrls.erc4337.http[0])),
     paymaster: {
       async getPaymasterData() {
         // return { paymaster: paymasterAddress as Hex, paymasterData: "0x" };
-        return { paymasterAndData: paymasterAddress as Hex };
+        return { paymasterAndData: paymaster.address as Hex };
       },
     },
   });

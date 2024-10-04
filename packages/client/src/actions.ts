@@ -1,4 +1,4 @@
-import { getAction, parseEther } from "viem/utils";
+import { getAction } from "viem/utils";
 import { adminClient, grantorClient, publicClient, smartAccountClient } from "./clients";
 import { waitForTransactionReceipt, writeContract } from "viem/actions";
 import { paymaster } from "./contract";
