@@ -7,8 +7,17 @@ import { useStash } from "./useStash";
 import { stash } from "./stash";
 import { getRecord } from "./getRecord";
 import config from "contracts/mud.config";
-import { setGrantAllowance, grantAllowance, registerPass, claim, issuePass, registerNamespace } from "./actions";
+import {
+  setGrantAllowance,
+  grantAllowance,
+  registerPass,
+  claim,
+  issuePass,
+  registerNamespace,
+  incrementCounter,
+} from "./actions";
 import { hexToResource } from "@latticexyz/common";
+import { chain } from "./chain";
 
 const tables = config.namespaces.root.tables;
 const passId = padHex("0x01", { size: 32, dir: "right" });
@@ -18,6 +27,9 @@ export const App = () => {
   const [grantorBalance, setGrantorBalance] = useState(0n);
   const [userBalance, setUserBalance] = useState(0n);
   const [namespace, setNamespace] = useState("");
+  const [claimAmount, setClaimAmount] = useState("");
+  const [claimInterval, setClaimInterval] = useState(0);
+  const [passValidity, setPassValidity] = useState(0);
 
   const updateBalance = useCallback(async () => {
     setAdminBalance(await getBalance(publicClient, { address: adminClient.account.address }));
@@ -88,7 +100,27 @@ export const App = () => {
           <button onClick={() => grantAllowance(parseEther("0.1"), smartAccountClient.account.address)}>
             Grant 0.1 ETH allowance to user
           </button>
-          <button onClick={() => registerPass(passId)}>Register new 0.01/5s/30s pass</button>
+
+          <input
+            placeholder="claim amount"
+            value={claimAmount}
+            onChange={(e) => setClaimAmount(e.target.value)}
+          ></input>
+          <input
+            placeholder="claim interval"
+            value={claimInterval}
+            onChange={(e) => setClaimInterval(Number(e.target.value))}
+          ></input>
+          <input
+            placeholder="pass validity"
+            value={passValidity}
+            onChange={(e) => setPassValidity(Number(e.target.value))}
+          ></input>
+          <button
+            onClick={() => registerPass(passId, parseEther(claimAmount), BigInt(claimInterval), BigInt(passValidity))}
+          >
+            Register new {claimAmount}/{claimInterval}s/{passValidity}s pass
+          </button>
           <button onClick={() => issuePass(passId, smartAccountClient.account.address)}>Issue pass to user</button>
         </div>
         <div className="td">
@@ -99,6 +131,7 @@ export const App = () => {
           <div>Last renewed: {new Date(Number(lastRenewed) * 1000).toLocaleTimeString()}</div>
           <input placeholder="namespace" value={namespace} onChange={(e) => setNamespace(e.target.value)}></input>
           <button onClick={() => registerNamespace(namespace)}>Register new namespace</button>
+          {"counter" in chain.contracts && <button onClick={() => incrementCounter()}>Increment counter</button>}
         </div>
       </div>
       <div>

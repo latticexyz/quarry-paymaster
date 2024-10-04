@@ -33,5 +33,9 @@ export const rhodolite = {
       address: paymaster.worldAddress as Hex,
       blockCreated: paymaster.blockNumber,
     },
+    counter: {
+      address: "0xbe4ab86c44aba5a9a26a346ee06c8f0a52dddb26",
+      blockCreated: 327717,
+    },
   },
 } satisfies Chain;
