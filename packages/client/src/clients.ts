@@ -7,17 +7,14 @@ import {
   ClientConfig,
   PublicClient,
   Hex,
-  Client,
-  HttpTransport,
-  BundlerRpcSchema,
 } from "viem";
 import { createBurnerAccount } from "@latticexyz/common";
 import { transactionQueue } from "@latticexyz/common/actions";
 import { observer } from "@latticexyz/explorer/observer";
-import { createBundlerClient, entryPoint06Address, SmartAccount } from "viem/account-abstraction";
+import { entryPoint06Address } from "viem/account-abstraction";
 import { worldAddress as paymasterAddress } from "contracts/deploys/31337/latest.json";
 import { toSimpleSmartAccount } from "permissionless/accounts";
-import { SmartAccountActions, smartAccountActions } from "permissionless";
+import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { chain } from "./chain";
 
 // for demo - 1st anvil key
@@ -67,21 +64,15 @@ const smartAccount = await toSimpleSmartAccount({
   owner: createBurnerAccount(userKey),
 });
 
-export const smartAccountClient: Client<
-  HttpTransport,
-  typeof chain,
-  SmartAccount,
-  BundlerRpcSchema,
-  SmartAccountActions
-> = createBundlerClient({
+export const smartAccountClient: SmartAccountClient = createSmartAccountClient({
   chain,
-  account: smartAccount as SmartAccount,
+  account: smartAccount,
   client: publicClient,
-  transport: http(chain.rpcUrls.erc4337.http[0]),
+  bundlerTransport: http(chain.rpcUrls.erc4337.http[0]),
   paymaster: {
     async getPaymasterData() {
       // return { paymaster: paymasterAddress as Hex, paymasterData: "0x" };
       return { paymasterAndData: paymasterAddress as Hex };
     },
   },
-}).extend(smartAccountActions());
+});
