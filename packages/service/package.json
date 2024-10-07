@@ -9,18 +9,10 @@
     "test": "tsc --noEmit"
   },
   "author": "",
-  "dependencies": {},
   "devDependencies": {
-    "express": "^4.21.0",
-    "arktype": "2.0.0-rc.14",
-    "body-parser": "^1.20.3",
-    "@types/body-parser": "^1.19.5",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.5.5",
-    "prettier": "3.2.5",
-    "tsup": "^8.3.0",
-    "typescript": "5.4.2",
-    "vite": "^5.4.6",
+    "@koa/bodyparser": "^5.1.1",
+    "@koa/cors": "^5.0.0",
+    "@koa/router": "^13.1.0",
     "@latticexyz/common": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
     "@latticexyz/config": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
     "@latticexyz/explorer": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
@@ -30,8 +22,20 @@
     "@latticexyz/store": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
     "@latticexyz/store-sync": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
     "@latticexyz/world": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@types/koa": "^2.15.0",
+    "@types/koa-compose": "^3.2.8",
+    "@types/koa__cors": "^5.0.0",
+    "@types/koa__router": "^12.0.4",
+    "@types/node": "^22.5.5",
+    "arktype": "2.0.0-rc.14",
     "contracts": "workspace:*",
+    "koa": "^2.15.3",
+    "koa-compose": "^4.1.0",
     "permissionless": "^0.2.3",
-    "viem": "2.21.6"
+    "prettier": "3.2.5",
+    "tsup": "^8.3.0",
+    "typescript": "5.4.2",
+    "viem": "2.21.6",
+    "vite": "^5.4.6"
   }
 }

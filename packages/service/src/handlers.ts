@@ -1,23 +1,15 @@
 import { type } from "arktype";
 
-const namespace = type("'quarry'");
-const method = type("'claimAllowance' | 'issuePass'");
+export const namespace = type("'quarry'");
+export const method = type("'claimAllowance' | 'issuePass'");
+export const params = type("(string | number | boolean)[]");
+export const parseParams = type("string").pipe((s) => JSON.parse(s), params);
 
-const jsonRpcMethods = type("string").pipe.try((jsonRpcMethod) => {
-  const [namespace, method] = jsonRpcMethod.split("_");
-  return { namespace, method };
-}, type({ namespace, method }));
-
-export const jsonRpcRequest = type({
-  method: jsonRpcMethods,
-  params: "(string | number | boolean)[]",
-  id: "number",
-  jsonrpc: "'2.0'",
-});
+type Handler = (input: typeof params.infer) => Promise<unknown>;
 
 type Handlers = {
   [namespace in typeof namespace.infer]: {
-    [method in typeof method.infer]: (input: typeof jsonRpcRequest.infer.params) => Promise<unknown>;
+    [method in typeof method.infer]: Handler;
   };
 };
 
@@ -33,3 +25,10 @@ export const handlers = {
     },
   },
 } satisfies Handlers;
+
+type GetHandlerInput = { namespace: string; method: string };
+
+export function getHandler({ namespace, method }: GetHandlerInput): Handler | undefined {
+  const namespaceHandlers = handlers[namespace as keyof typeof handlers];
+  return namespaceHandlers && namespaceHandlers[method as keyof typeof namespaceHandlers];
+}
