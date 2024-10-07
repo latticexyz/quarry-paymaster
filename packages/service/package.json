@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsup && chmod +x ./dist/index.js",
+    "start": ". .env && pnpm build && CHAIN_ID=$CHAIN_ID SIGNER_PRIVATE_KEY=$SIGNER_PRIVATE_KEY node ./dist/index.js",
     "dev": "tsup --watch",
     "test": "tsc --noEmit"
   },

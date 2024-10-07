@@ -24,7 +24,7 @@ export function jsonRpc(): Middleware {
     if (request instanceof type.errors) {
       console.error(request.summary);
 
-      ctx.status = 500;
+      ctx.status = 200;
       ctx.body = {
         // https://www.jsonrpc.org/specification#error_object
         id: ctx.request.body.id ?? null,
@@ -51,7 +51,7 @@ export function jsonRpc(): Middleware {
         result,
       };
     } catch (error) {
-      ctx.status = 500;
+      ctx.status = 200;
       ctx.body = {
         // https://www.jsonrpc.org/specification#error_object
         id: request.id,
