@@ -25,9 +25,11 @@ export const handlers = {
   quarry: {
     claimAllowance: async (input) => {
       console.log("quarry_claimAllowance", input);
+      return { message: "success" };
     },
     issuePass: async (input) => {
       console.log("quarry_issuePass", input);
+      return { message: "success" };
     },
   },
 } satisfies Handlers;

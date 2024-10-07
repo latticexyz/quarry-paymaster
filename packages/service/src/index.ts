@@ -13,6 +13,9 @@ app.post("/rpc", async (req, res) => {
     console.error(request.summary);
     res
       .send({
+        // https://www.jsonrpc.org/specification#error_object
+        id: req.body.id ?? null,
+        jsonrpc: "2.0",
         error: {
           code: -32601,
           message: request.summary,
@@ -26,10 +29,27 @@ app.post("/rpc", async (req, res) => {
   const { params } = request;
 
   try {
-    const result = handlers[namespace][method](params);
-    res.send(result).status(200);
+    const result = await handlers[namespace][method](params);
+    res
+      .send({
+        // https://www.jsonrpc.org/specification
+        id: request.id,
+        jsonrpc: "2.0",
+        result,
+      })
+      .status(200);
   } catch (error) {
-    res.send({ error }).status(500);
+    res
+      .send({
+        // https://www.jsonrpc.org/specification#error_object
+        id: request.id,
+        jsonrpc: "2.0",
+        error: {
+          code: -32603,
+          message: String(error),
+        },
+      })
+      .status(500);
   }
 });
 
