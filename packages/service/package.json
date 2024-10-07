@@ -1,0 +1,33 @@
+{
+  "name": "contracts",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "tsup && chmod +x ./dist/index.js",
+    "dev": "tsup --watch",
+    "test": "tsc --noEmit"
+  },
+  "author": "",
+  "dependencies": {
+    "@latticexyz/common": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/config": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/explorer": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/protocol-parser": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/schema-type": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/stash": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/store": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/store-sync": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "@latticexyz/world": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
+    "contracts": "workspace:*",
+    "permissionless": "^0.2.3",
+    "viem": "2.21.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.5",
+    "prettier": "3.2.5",
+    "typescript": "5.4.2",
+    "vite": "^5.4.6",
+    "tsup": "^8.3.0"
+  }
+}

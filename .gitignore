@@ -6,3 +6,5 @@ node_modules
 # sqlite indexer data
 *.db
 *.db-journal
+
+dist
