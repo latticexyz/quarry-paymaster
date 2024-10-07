@@ -9,7 +9,18 @@
     "test": "tsc --noEmit"
   },
   "author": "",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "express": "^4.21.0",
+    "arktype": "2.0.0-rc.14",
+    "body-parser": "^1.20.3",
+    "@types/body-parser": "^1.19.5",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.5.5",
+    "prettier": "3.2.5",
+    "tsup": "^8.3.0",
+    "typescript": "5.4.2",
+    "vite": "^5.4.6",
     "@latticexyz/common": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
     "@latticexyz/config": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
     "@latticexyz/explorer": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
@@ -22,12 +33,5 @@
     "contracts": "workspace:*",
     "permissionless": "^0.2.3",
     "viem": "2.21.6"
-  },
-  "devDependencies": {
-    "@types/node": "^22.5.5",
-    "prettier": "3.2.5",
-    "typescript": "5.4.2",
-    "vite": "^5.4.6",
-    "tsup": "^8.3.0"
   }
 }
