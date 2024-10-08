@@ -1,19 +1,10 @@
 import { type } from "arktype";
 import { HexType } from "../common";
 import { params } from "./common";
-import {
-  decodeErrorResult,
-  DecodeErrorResultReturnType,
-  formatAbiItem,
-  formatAbiItemWithArgs,
-  getAction,
-  isHex,
-  padHex,
-} from "viem/utils";
+import { decodeErrorResult, formatAbiItemWithArgs, getAction, isHex, padHex } from "viem/utils";
 import { getSmartAccountClient, bundlerClient } from "../clients";
 import { sendUserOperation, UserOperationReceipt, waitForUserOperationReceipt } from "viem/account-abstraction";
 import { paymaster } from "../contract";
-import { Hex } from "viem";
 
 /**
  * [receiver: Hex, passId: Hex]
@@ -21,6 +12,7 @@ import { Hex } from "viem";
 const ClaimAllowanceInput = type([HexType, HexType]);
 
 export async function claimAllowance(rawInput: typeof params.infer) {
+  console.log("input", rawInput);
   const input = ClaimAllowanceInput(rawInput);
   if (input instanceof type.errors) {
     throw new Error(input.summary);

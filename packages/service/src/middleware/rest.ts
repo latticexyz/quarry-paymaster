@@ -1,10 +1,10 @@
 import { Middleware } from "koa";
 import Router from "@koa/router";
 import compose from "koa-compose";
-import { getHandler, params } from "../handlers";
+import { getHandler, parseParams } from "../handlers";
 import { type } from "arktype";
 
-export const parseQuery = type({ "params?": params });
+export const parseQuery = type({ "params?": parseParams });
 
 export function rest(): Middleware {
   const router = new Router();
