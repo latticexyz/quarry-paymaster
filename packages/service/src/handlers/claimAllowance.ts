@@ -7,18 +7,17 @@ import { sendUserOperation, UserOperationReceipt, waitForUserOperationReceipt } 
 import { paymaster } from "../contract";
 
 /**
- * [receiver: Hex, passId: Hex]
+ * [passId: Hex, receiver: Hex]
  */
 const ClaimAllowanceInput = type([HexType, HexType]);
 
 export async function claimAllowance(rawInput: typeof params.infer) {
-  console.log("input", rawInput);
   const input = ClaimAllowanceInput(rawInput);
   if (input instanceof type.errors) {
     throw new Error(input.summary);
   }
 
-  const [receiver, passId] = input;
+  const [passId, receiver] = input;
   const hash = await getAction(
     await getSmartAccountClient(),
     sendUserOperation,

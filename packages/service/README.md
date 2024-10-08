@@ -35,17 +35,17 @@ Namespace: `quarry`
 
 Method: `claimAllowance`
 
-Parameters: `[user: address, passId: bytes32]`
+Parameters: `[passId: bytes32, user: address]`
 
 #### RPC
 
 ```bash
-cast rpc quarry_claimAllowance 0xF58A647F89D70e275ead00D4F169176636274144 0x01 --rpc-url http://localhost:3003/rpc
+cast rpc quarry_claimAllowance 0x01 0xF58A647F89D70e275ead00D4F169176636274144 --rpc-url http://localhost:3003/rpc
 ```
 
 #### REST
 
 ```bash
-params='["0xF58A647F89D70e275ead00D4F169176636274144","0x01"]'
+params='["0x01","0xF58A647F89D70e275ead00D4F169176636274144"]'
 curl -G "http://localhost:3003/api/quarry/claimAllowance" --data-urlencode "params=$params"
 ```
