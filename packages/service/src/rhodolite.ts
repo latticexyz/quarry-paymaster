@@ -1,6 +1,6 @@
 import { chainConfig } from "viem/op-stack";
 import { Chain } from "viem/chains";
-import worlds from "../../contracts/worlds.json";
+import worlds from "contracts/worlds.json";
 
 const sourceId = 17000; // Holesky
 export const rhodolite = {

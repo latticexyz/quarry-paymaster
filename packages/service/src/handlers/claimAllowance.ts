@@ -1,10 +1,19 @@
 import { type } from "arktype";
 import { HexType } from "../common";
 import { params } from "./common";
-import { getAction, padHex } from "viem/utils";
-import { publicClient, getSmartAccountClient } from "../clients";
-import { sendUserOperation, waitForUserOperationReceipt } from "viem/account-abstraction";
+import {
+  decodeErrorResult,
+  DecodeErrorResultReturnType,
+  formatAbiItem,
+  formatAbiItemWithArgs,
+  getAction,
+  isHex,
+  padHex,
+} from "viem/utils";
+import { getSmartAccountClient, bundlerClient } from "../clients";
+import { sendUserOperation, UserOperationReceipt, waitForUserOperationReceipt } from "viem/account-abstraction";
 import { paymaster } from "../contract";
+import { Hex } from "viem";
 
 /**
  * [receiver: Hex, passId: Hex]
@@ -18,7 +27,6 @@ export async function claimAllowance(rawInput: typeof params.infer) {
   }
 
   const [receiver, passId] = input;
-  console.log("failed before sending");
   const hash = await getAction(
     await getSmartAccountClient(),
     sendUserOperation,
@@ -36,12 +44,38 @@ export async function claimAllowance(rawInput: typeof params.infer) {
     verificationGasLimit: 1_000_000n,
     callGasLimit: 1_000_000n,
   });
-  console.log("Waiting for user operation request", hash);
-  const result = await waitForUserOperationReceipt(publicClient, { hash });
+  const receipt = await waitForUserOperationReceipt(bundlerClient, { hash });
 
-  if (!result.success) {
-    throw new Error(`Failed to claim allowance for ${receiver} from pass ${passId}`);
+  if (!receipt.success) {
+    throw new Error(formatRevertReason(receipt));
   }
 
   return { message: `Successfully claimed allowance for ${receiver} from pass ${passId}.` };
+}
+
+function formatRevertReason(receipt: UserOperationReceipt): string {
+  if (!isHex(receipt.reason)) {
+    return `Failed to claim allowance for an unknown reason.\n\nTransaction hash: ${receipt.receipt.transactionHash}`;
+  }
+
+  const reason = decodeErrorResult({ abi: paymaster.abi, data: receipt.reason });
+
+  let output = formatAbiItemWithArgs(reason) + "\n\n";
+
+  if (reason.errorName === "PassSystem_PendingCooldown") {
+    output += `Next time user ${reason.args[2]} can claim from pass ${reason.args[0]} is ${new Date(Number(reason.args[3] + reason.args[1]) * 1000).toUTCString()}.\n\n`;
+  }
+
+  if (reason.errorName === "PassSystem_PassExpired") {
+    output +=
+      reason.args[3] === 0n
+        ? `User ${reason.args[2]} doesn't have pass ${reason.args[0]}.\n\n`
+        : `User ${reason.args[2]}'s pass ${reason.args[0]} expired on ${new Date(Number(reason.args[3] + reason.args[1]) * 1000).toUTCString()}.\n\n`;
+  }
+
+  if (reason.errorName === "PassSystem_InsufficientGrantorAllowance") {
+    output += `Grantor ${reason.args[1]} ran out of grant allowance.\n\n`;
+  }
+
+  return output + `Transaction hash: ${receipt.receipt.transactionHash}`;
 }

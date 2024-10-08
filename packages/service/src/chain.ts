@@ -1,7 +1,7 @@
 import { anvil } from "viem/chains";
 import { rhodolite } from "./rhodolite";
 import { Chain } from "viem";
-import worlds from "../../contracts/worlds.json";
+import worlds from "contracts/worlds.json";
 import env from "./env";
 
 const anvilWithPaymaster = {
@@ -9,7 +9,7 @@ const anvilWithPaymaster = {
   rpcUrls: {
     ...anvil.rpcUrls,
     erc4337: {
-      http: ["http://localhost:4337"],
+      http: ["http://127.0.0.1:4337"],
     },
   },
   contracts: {

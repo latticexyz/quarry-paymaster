@@ -1,6 +1,6 @@
 import { createPublicClient, http, ClientConfig, PublicClient, Hex, HttpTransport } from "viem";
 import { createBurnerAccount } from "@latticexyz/common";
-import { entryPoint06Address, SmartAccount } from "viem/account-abstraction";
+import { createBundlerClient, entryPoint06Address, SmartAccount } from "viem/account-abstraction";
 import { toSimpleSmartAccount } from "permissionless/accounts";
 import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { chain } from "./chain";
@@ -14,6 +14,11 @@ const clientOptions = {
 } as const satisfies ClientConfig;
 
 export const publicClient: PublicClient = createPublicClient(clientOptions);
+
+export const bundlerClient = createBundlerClient({
+  ...clientOptions,
+  transport: http(chain.rpcUrls.erc4337.http[0]),
+});
 
 let smartAccount: SmartAccount;
 async function getSmartAccount(): Promise<SmartAccount> {
