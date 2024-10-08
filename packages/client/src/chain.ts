@@ -1,7 +1,7 @@
 import { anvil } from "viem/chains";
 import { rhodolite } from "./rhodolite";
-import { Chain, Hex } from "viem";
-import paymaster from "contracts/deploys/31337/latest.json";
+import { Chain } from "viem";
+import paymasters from "contracts/worlds.json";
 
 const anvilWithPaymaster = {
   ...anvil,
@@ -13,8 +13,8 @@ const anvilWithPaymaster = {
   },
   contracts: {
     quarryPaymaster: {
-      address: paymaster.worldAddress as Hex,
-      blockCreated: paymaster.blockNumber,
+      address: paymasters[31337]!.address,
+      blockCreated: paymasters[31337]!.blockNumber,
     },
   },
 } satisfies Chain;

@@ -1,7 +1,6 @@
 import { chainConfig } from "viem/op-stack";
 import { Chain } from "viem/chains";
-import { Hex } from "viem";
-import paymaster from "contracts/deploys/17420/latest.json";
+import paymasters from "contracts/worlds.json";
 
 const sourceId = 17000; // Holesky
 export const rhodolite = {
@@ -30,8 +29,8 @@ export const rhodolite = {
       },
     },
     quarryPaymaster: {
-      address: paymaster.worldAddress as Hex,
-      blockCreated: paymaster.blockNumber,
+      address: paymasters[17420]!.address,
+      blockCreated: paymasters[17420]!.blockNumber,
     },
     counter: {
       address: "0xbe4ab86c44aba5a9a26a346ee06c8f0a52dddb26",
