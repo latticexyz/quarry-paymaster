@@ -2,7 +2,7 @@ import { createPublicClient, http, createWalletClient, ClientConfig, PublicClien
 import { createBurnerAccount } from "@latticexyz/common";
 import { transactionQueue } from "@latticexyz/common/actions";
 import { observer } from "@latticexyz/explorer/observer";
-import { entryPoint06Address, SmartAccount } from "viem/account-abstraction";
+import { entryPoint07Address, SmartAccount } from "viem/account-abstraction";
 import { toSimpleSmartAccount } from "permissionless/accounts";
 import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { chain } from "./chain";
@@ -47,10 +47,8 @@ export const userClient = createWalletClient({
 
 const smartAccount: SmartAccount = await toSimpleSmartAccount({
   client: publicClient,
-  // entryPoint: { address: entryPoint07Address, version: "0.7" },
-  entryPoint: { address: entryPoint06Address, version: "0.6" },
-  // factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
-  factoryAddress: "0x9406Cc6185a346906296840746125a0E44976454",
+  entryPoint: { address: entryPoint07Address, version: "0.7" },
+  factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
   owner: createBurnerAccount(userKey),
 });
 
@@ -62,8 +60,7 @@ export const smartAccountClient: SmartAccountClient<HttpTransport, typeof chain,
     bundlerTransport: wiresaw(http(chain.rpcUrls.erc4337.http[0])),
     paymaster: {
       async getPaymasterData() {
-        // return { paymaster: paymasterAddress as Hex, paymasterData: "0x" };
-        return { paymasterAndData: paymaster.address as Hex };
+        return { paymaster: paymaster.address, paymasterData: "0x" };
       },
     },
   });
