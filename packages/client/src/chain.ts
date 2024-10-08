@@ -8,7 +8,7 @@ const anvilWithPaymaster = {
   rpcUrls: {
     ...anvil.rpcUrls,
     erc4337: {
-      http: ["http://localhost:4337"],
+      http: ["http://127.0.0.1:4337"],
     },
   },
   contracts: {

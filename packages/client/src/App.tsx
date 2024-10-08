@@ -20,7 +20,7 @@ import { hexToResource } from "@latticexyz/common";
 import { chain } from "./chain";
 
 const tables = config.namespaces.root.tables;
-const passId = padHex("0x01", { size: 32, dir: "right" });
+const passId = padHex("0x01");
 
 export const App = () => {
   const [adminBalance, setAdminBalance] = useState(0n);
@@ -83,7 +83,7 @@ export const App = () => {
 
         <div className="td">{adminClient.account?.address.slice(0, 10)}...</div>
         <div className="td">{grantorClient.account?.address.slice(0, 10)}...</div>
-        <div className="td">{smartAccountClient.account?.address.slice(0, 10)}...</div>
+        <div className="td">{smartAccountClient.account?.address}</div>
 
         <div className="td">ETH Balance: {formatEther(adminBalance)}</div>
         <div className="td">ETH Balance: {formatEther(grantorBalance)}</div>

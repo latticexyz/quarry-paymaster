@@ -16,6 +16,7 @@ procs:
     shell: pnpm ts-node scripts/localDeployer/index.ts &&
       cd ../quarry-paymaster/packages/contracts &&
       pnpm fund:paymaster:local &&
+      pnpm fund:service:local &&
       cd ../../../alto &&
       ./alto --config ../quarry-paymaster/alto.config.json
   service:
