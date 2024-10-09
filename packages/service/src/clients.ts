@@ -30,7 +30,7 @@ async function getSmartAccount(): Promise<SmartAccount> {
     client: publicClient,
     entryPoint: { address: entryPoint07Address, version: "0.7" },
     factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
-    owner: createBurnerAccount(env.SIGNER_PRIVATE_KEY as Hex),
+    owner: createBurnerAccount(env.ISSUER_PRIVATE_KEY as Hex),
   });
 
   return smartAccount;

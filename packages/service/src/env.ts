@@ -2,7 +2,7 @@ import { type } from "arktype";
 
 const env = type({
   CHAIN_ID: "string",
-  SIGNER_PRIVATE_KEY: "string",
+  ISSUER_PRIVATE_KEY: "string",
   "PORT?": "string",
 });
 

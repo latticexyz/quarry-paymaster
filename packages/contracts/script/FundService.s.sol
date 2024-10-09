@@ -18,7 +18,7 @@ contract FundService is Script {
 
     // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-    address serviceAddress = vm.envAddress("SERVICE_ADDRESS");
+    address serviceAddress = vm.envAddress("ISSUER_ADDRESS");
     IWorld paymaster = IWorld(worldAddress);
     bytes32 passId = bytes32(uint256(1));
 
