@@ -15,8 +15,8 @@
     "prettier": "prettier --write 'src/**/*.sol'",
     "solhint": "solhint --config ./.solhint.json 'src/**/*.sol' --fix",
     "test": "tsc --noEmit && mud test",
-    "fund:paymaster:local": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv 0x8d8b6b8414e1e3dcfd4168561b9be6bd3bf6ec4b",
-    "fund:service:local": "forge script FundService --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv 0x8d8b6b8414e1e3dcfd4168561b9be6bd3bf6ec4b",
+    "fund:paymaster:local": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv $(jq -r '.[\"31337\"].address' worlds.json)",
+    "fund:service:local": "forge script FundService --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv $(jq -r '.[\"31337\"].address' worlds.json)",
     "fund:paymaster:rhodolite": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url http://79.127.239.88:58545 -vvv"
   },
   "dependencies": {
