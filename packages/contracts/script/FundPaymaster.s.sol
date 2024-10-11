@@ -21,7 +21,7 @@ contract FundPaymaster is Script {
     // Start broadcasting transactions from the deployer account
     vm.startBroadcast(deployerPrivateKey);
 
-    entryPoint.depositTo{ value: 0.1 ether }(worldAddress);
+    entryPoint.depositTo{ value: 1 ether }(worldAddress);
 
     vm.stopBroadcast();
   }
