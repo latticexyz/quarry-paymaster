@@ -16,10 +16,11 @@ procs:
     shell: pnpm ts-node scripts/localDeployer/index.ts &&
       cd ../quarry-paymaster/packages/contracts &&
       pnpm fund:paymaster:local &&
+      echo 'sleep 6' &&
       sleep 6 &&
-      pnpm fund:service:local &&
+      pnpm fund:issuer:local &&
       cd ../../../alto &&
       ./alto --config ../quarry-paymaster/alto.config.json
-  service:
-    cwd: packages/service
-    shell: sleep 4 && pnpm start
+  issuer:
+    cwd: packages/issuer
+    shell: echo 'sleep 4' && sleep 4 && pnpm start

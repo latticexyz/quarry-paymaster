@@ -16,8 +16,8 @@
     "solhint": "solhint --config ./.solhint.json 'src/**/*.sol' --fix",
     "test": "tsc --noEmit && mud test",
     "fund:paymaster:local": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv $(jq -r '.[\"31337\"].address' worlds.json)",
-    "fund:service:local": "forge script FundService --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv $(jq -r '.[\"31337\"].address' worlds.json)",
-    "fund:service:rhodolite": "forge script FundService --broadcast --sig \"run(address)\" --rpc-url https://rpc.rhodolitechain.com -vvv $(jq -r '.[\"17420\"].address' worlds.json)",
+    "fund:issuer:local": "forge script FundIssuer --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv $(jq -r '.[\"31337\"].address' worlds.json)",
+    "fund:issuer:rhodolite": "forge script FundIssuer --broadcast --sig \"run(address)\" --rpc-url https://rpc.rhodolitechain.com -vvv $(jq -r '.[\"17420\"].address' worlds.json)",
     "fund:paymaster:rhodolite": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url https://rpc.rhodolitechain.com -vvv $(jq -r '.[\"17420\"].address' worlds.json)"
   },
   "dependencies": {

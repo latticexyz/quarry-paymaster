@@ -1,5 +1,5 @@
 {
-  "name": "service",
+  "name": "issuer",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
@@ -37,9 +37,8 @@
     "tsup": "^8.3.0",
     "typescript": "5.4.2",
     "viem": "2.21.6",
-    "vite": "^5.4.6"
-  },
-  "dependencies": {
+    "vite": "^5.4.6",
     "debug": "^4.3.7"
-  }
+  },
+  "dependencies": {}
 }
