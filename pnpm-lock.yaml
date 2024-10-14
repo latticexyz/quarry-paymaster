@@ -164,11 +164,7 @@ importers:
         specifier: 2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6
         version: 2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6
 
-  packages/service:
-    dependencies:
-      debug:
-        specifier: ^4.3.7
-        version: 4.3.7
+  packages/issuer:
     devDependencies:
       '@koa/bodyparser':
         specifier: ^5.1.1
@@ -227,6 +223,9 @@ importers:
       contracts:
         specifier: workspace:*
         version: link:../contracts
+      debug:
+        specifier: ^4.3.7
+        version: 4.3.7
       koa:
         specifier: ^2.15.3
         version: 2.15.3
