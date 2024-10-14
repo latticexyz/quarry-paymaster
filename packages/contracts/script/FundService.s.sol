@@ -26,7 +26,7 @@ contract FundService is Script {
     vm.startBroadcast(deployerPrivateKey);
 
     // Set a grant allowance for the paymaster service to grant allowance to users
-    paymaster.setGrantAllowance(serviceAddress, 99999 ether);
+    paymaster.setGrantAllowance(serviceAddress, 999999 ether);
 
     // Register pass to issue to users
     paymaster.registerPass({
@@ -40,7 +40,7 @@ contract FundService is Script {
     PassConfig.setGrantor(passId, serviceAddress);
 
     // Grant a high allowance to the paymaster service to send user operations to issue passes and claim allowance
-    Allowance.setAllowance(serviceAddress, 99999 ether);
+    Allowance.setAllowance(serviceAddress, 999999 ether);
 
     vm.stopBroadcast();
   }
