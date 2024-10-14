@@ -5,6 +5,7 @@ import { decodeErrorResult, formatAbiItemWithArgs, getAction, isHex, padHex, toH
 import { bundlerClient, getSmartAccountClient } from "../clients";
 import { sendUserOperation, UserOperationReceipt, waitForUserOperationReceipt } from "viem/account-abstraction";
 import { paymaster } from "../contract";
+import { debug } from "../debug";
 
 /**
  * [passId: Hex, receiver: Hex]
@@ -20,6 +21,7 @@ export async function issuePass(rawInput: typeof params.infer) {
   const smartAccountClient = await getSmartAccountClient();
 
   const [passId, receiver] = input;
+  debug(`sending user operation to issue pass ${passId} to ${receiver}`);
   const hash = await getAction(
     smartAccountClient,
     sendUserOperation,
@@ -38,12 +40,16 @@ export async function issuePass(rawInput: typeof params.infer) {
     callGasLimit: 1_000_000n,
   });
 
+  debug(`waiting for user operation receipt for tx ${hash}`);
   const receipt = await waitForUserOperationReceipt(bundlerClient, { hash });
 
   if (!receipt.success) {
-    throw new Error(formatRevertReason(receipt));
+    const errorMessage = formatRevertReason(receipt);
+    debug(errorMessage);
+    throw new Error(errorMessage);
   }
 
+  debug(`successfully issued pass ${passId} to ${receiver}`);
   return { message: `Successfully issued pass ${passId} to ${receiver}` };
 }
 
