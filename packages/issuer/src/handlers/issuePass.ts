@@ -35,6 +35,8 @@ export async function issuePass(rawInput: typeof params.infer) {
         args: [padHex(passId), receiver],
       },
     ],
+    maxFeePerGas: 100_000n,
+    maxPriorityFeePerGas: 0n,
     preVerificationGas: 100_000n,
     verificationGasLimit: 1_000_000n,
     callGasLimit: 1_000_000n,

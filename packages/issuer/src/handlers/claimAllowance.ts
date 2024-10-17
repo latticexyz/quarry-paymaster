@@ -33,6 +33,8 @@ export async function claimAllowance(rawInput: typeof params.infer) {
         args: [receiver, padHex(passId)],
       },
     ],
+    maxFeePerGas: 100_000n,
+    maxPriorityFeePerGas: 0n,
     preVerificationGas: 100_000n,
     verificationGasLimit: 1_000_000n,
     callGasLimit: 1_000_000n,
