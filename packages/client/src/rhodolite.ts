@@ -15,9 +15,8 @@ export const rhodolite = {
     default: {
       http: ["https://rpc.rhodolitechain.com"],
     },
-    // TODO: put behind peroxide/proxyd
     erc4337: {
-      http: ["http://79.127.239.88:54337"],
+      http: ["https://rpc.rhodolitechain.com"],
     },
   },
   contracts: {
