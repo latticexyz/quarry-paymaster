@@ -52,7 +52,7 @@ export async function issuePass(rawInput: typeof params.infer) {
   }
 
   debug(`successfully issued pass ${passId} to ${receiver}`);
-  return { message: `Successfully issued pass ${passId} to ${receiver}` };
+  return { message: `Successfully issued pass ${passId} to ${receiver}.`, hash };
 }
 
 function formatRevertReason(receipt: UserOperationReceipt): string {
