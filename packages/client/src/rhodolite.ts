@@ -15,7 +15,7 @@ export const rhodolite = {
     default: {
       http: ["https://rpc.rhodolitechain.com"],
     },
-    erc4337: {
+    bundler: {
       http: ["https://rpc.rhodolitechain.com"],
     },
   },

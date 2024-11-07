@@ -6,18 +6,20 @@ import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { chain } from "./chain";
 import { paymaster } from "./contract";
 import env from "./env";
+import { wiresaw } from "./transports/wiresaw";
 
 const clientOptions = {
   chain,
   transport: http(), // fallback([webSocket(), http()]),
-  pollingInterval: 10,
+  pollingInterval: chain.id === 31337 ? 10 : 500,
 } as const satisfies ClientConfig;
 
 export const publicClient: PublicClient = createPublicClient(clientOptions);
 
+export const bundlerTransport = wiresaw(http(chain.rpcUrls.bundler.http[0]));
 export const bundlerClient = createBundlerClient({
   ...clientOptions,
-  transport: http(chain.rpcUrls.erc4337.http[0]),
+  transport: bundlerTransport,
 });
 
 let smartAccount: SmartAccount;
@@ -48,7 +50,7 @@ export async function getSmartAccountClient(): Promise<
     chain,
     account: await getSmartAccount(),
     client: publicClient,
-    bundlerTransport: http(chain.rpcUrls.erc4337.http[0]),
+    bundlerTransport,
     paymaster: {
       async getPaymasterData() {
         return { paymaster: paymaster.address, paymasterData: "0x" };
