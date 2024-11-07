@@ -38,6 +38,8 @@ export async function claimAllowance(rawInput: typeof params.infer) {
     preVerificationGas: 100_000n,
     verificationGasLimit: 1_000_000n,
     callGasLimit: 1_000_000n,
+    paymasterVerificationGasLimit: 100_000n,
+    paymasterPostOpGasLimit: 100_000n,
   });
 
   debug(`waiting for user operation receipt for tx ${hash}`);
