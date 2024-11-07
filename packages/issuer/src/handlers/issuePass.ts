@@ -43,7 +43,7 @@ export async function issuePass(rawInput: typeof params.infer) {
   });
 
   debug(`waiting for user operation receipt for tx ${hash}`);
-  const receipt = await waitForUserOperationReceipt(bundlerClient, { hash });
+  const receipt = await getAction(bundlerClient, waitForUserOperationReceipt, "waitForUserOperationReceipt")({ hash });
 
   if (!receipt.success) {
     const errorMessage = formatRevertReason(receipt);
@@ -52,7 +52,7 @@ export async function issuePass(rawInput: typeof params.infer) {
   }
 
   debug(`successfully issued pass ${passId} to ${receiver}`);
-  return { message: `Successfully issued pass ${passId} to ${receiver}` };
+  return { message: `Successfully issued pass ${passId} to ${receiver}.`, hash };
 }
 
 function formatRevertReason(receipt: UserOperationReceipt): string {

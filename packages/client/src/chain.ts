@@ -7,7 +7,7 @@ const anvilWithPaymaster = {
   ...anvil,
   rpcUrls: {
     ...anvil.rpcUrls,
-    erc4337: {
+    bundler: {
       http: ["http://127.0.0.1:4337"],
     },
   },

@@ -19,7 +19,7 @@ const userKey = "0xab824ae96b4d6bf50deddfc4ec7fe0ed54ce3e601277239c41f4630b98e5c
 const clientOptions = {
   chain,
   transport: http(), // fallback([webSocket(), http()]),
-  pollingInterval: 10,
+  pollingInterval: chain.id === 31337 ? 10 : 500,
 } as const satisfies ClientConfig;
 
 export const publicClient: PublicClient = createPublicClient(clientOptions);
@@ -57,7 +57,7 @@ export const smartAccountClient: SmartAccountClient<HttpTransport, typeof chain,
     chain,
     account: smartAccount,
     client: publicClient,
-    bundlerTransport: wiresaw(http(chain.rpcUrls.erc4337.http[0])),
+    bundlerTransport: wiresaw(http(chain.rpcUrls.bundler.http[0])),
     paymaster: {
       async getPaymasterData() {
         return { paymaster: paymaster.address, paymasterData: "0x" };

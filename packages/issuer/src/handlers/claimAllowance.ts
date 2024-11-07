@@ -5,7 +5,7 @@ import { decodeErrorResult, formatAbiItemWithArgs, getAction, isHex, padHex } fr
 import { getSmartAccountClient, bundlerClient } from "../clients";
 import { sendUserOperation, UserOperationReceipt, waitForUserOperationReceipt } from "viem/account-abstraction";
 import { paymaster } from "../contract";
-import { debug, error } from "../debug";
+import { debug } from "../debug";
 
 /**
  * [passId: Hex, receiver: Hex]
@@ -41,7 +41,7 @@ export async function claimAllowance(rawInput: typeof params.infer) {
   });
 
   debug(`waiting for user operation receipt for tx ${hash}`);
-  const receipt = await waitForUserOperationReceipt(bundlerClient, { hash });
+  const receipt = await getAction(bundlerClient, waitForUserOperationReceipt, "waitForUserOperationReceipt")({ hash });
 
   if (!receipt.success) {
     const errorMessage = formatRevertReason(receipt);
@@ -50,7 +50,7 @@ export async function claimAllowance(rawInput: typeof params.infer) {
   }
 
   debug(`successfully issued pass ${passId} to ${receiver}`);
-  return { message: `Successfully claimed allowance for ${receiver} from pass ${passId}.` };
+  return { message: `Successfully claimed allowance for ${receiver} from pass ${passId}.`, hash };
 }
 
 function formatRevertReason(receipt: UserOperationReceipt): string {
