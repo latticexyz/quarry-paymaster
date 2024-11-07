@@ -41,7 +41,7 @@ export async function claimAllowance(rawInput: typeof params.infer) {
   });
 
   debug(`waiting for user operation receipt for tx ${hash}`);
-  const receipt = await waitForUserOperationReceipt(bundlerClient, { hash });
+  const receipt = await getAction(bundlerClient, waitForUserOperationReceipt, "waitForUserOperationReceipt")({ hash });
 
   if (!receipt.success) {
     const errorMessage = formatRevertReason(receipt);

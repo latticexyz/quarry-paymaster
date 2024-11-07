@@ -34,6 +34,23 @@ export type OverriddenMethods = [
 ];
 
 export function wiresaw<const transport extends Transport>(getTransport: transport): transport {
+  const cache = new Map<
+    Hex,
+    {
+      receipts: Map<Hash, RpcTransactionReceipt>;
+      userOpReceipts: Map<Hash, RpcUserOperationReceipt>;
+    }
+  >();
+
+  function getReceiptsCache(chainId: Hex) {
+    const cached = cache.get(chainId) ?? {
+      receipts: new Map<Hash, RpcTransactionReceipt>(),
+      userOpReceipts: new Map<Hash, RpcUserOperationReceipt>(),
+    };
+    if (!cache.has(chainId)) cache.set(chainId, cached);
+    return cached;
+  }
+
   return ((args) => {
     const getWiresawTransport =
       args.chain?.rpcUrls && "wiresaw" in args.chain.rpcUrls ? http(args.chain.rpcUrls.wiresaw.http[0]) : undefined;
@@ -43,13 +60,15 @@ export function wiresaw<const transport extends Transport>(getTransport: transpo
     const wiresawTransport = getWiresawTransport(args) as { request: TransportRequestFn<WiresawRpcSchema> };
 
     let chainId: Hex | null = null;
-    const receipts = new Map<Hash, RpcTransactionReceipt>();
-    const userOpReceipts = new Map<Hash, RpcUserOperationReceipt>();
+    async function getChainId() {
+      return (chainId ??= await transport.request({ method: "eth_chainId" }));
+    }
 
     const request: TransportRequestFnMapped<OverriddenMethods> = async ({ method, params }, opts) => {
+      const { receipts, userOpReceipts } = getReceiptsCache(await getChainId());
+
       if (method === "eth_chainId") {
-        if (chainId != null) return chainId;
-        return (chainId = await transport.request({ method, params }, opts));
+        return await getChainId();
       }
 
       // TODO: only route to wiresaw if using pending block tag
@@ -69,17 +88,20 @@ export function wiresaw<const transport extends Transport>(getTransport: transpo
           method: "wiresaw_sendUserOperation",
           params,
         });
+
         // :haroldsmile:
         userOpReceipts.set(result.userOpHash, {
           success: true,
           userOpHash: result.userOpHash,
           receipt: { transactionHash: result.txHash },
         } as RpcUserOperationReceipt);
+
         return result.userOpHash;
       }
 
       if (method === "eth_getUserOperationReceipt") {
         const [hash] = params;
+
         const receipt = userOpReceipts.get(hash) ?? (await transport.request({ method, params }));
         if (!userOpReceipts.has(hash) && receipt) userOpReceipts.set(hash, receipt);
         return receipt;
