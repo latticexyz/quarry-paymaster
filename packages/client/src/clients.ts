@@ -19,7 +19,7 @@ const userKey = "0xab824ae96b4d6bf50deddfc4ec7fe0ed54ce3e601277239c41f4630b98e5c
 const clientOptions = {
   chain,
   transport: http(), // fallback([webSocket(), http()]),
-  pollingInterval: chain.id === 31337 ? 10 : 500,
+  pollingInterval: chain.id === 31337 ? 100 : 500,
 } as const satisfies ClientConfig;
 
 export const publicClient: PublicClient = createPublicClient(clientOptions);
