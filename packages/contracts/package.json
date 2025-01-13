@@ -18,7 +18,9 @@
     "fund:paymaster:local": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv $(jq -r '.[\"31337\"].address' worlds.json)",
     "fund:issuer:local": "forge script FundIssuer --broadcast --sig \"run(address)\" --rpc-url http://127.0.0.1:8545 -vvv $(jq -r '.[\"31337\"].address' worlds.json)",
     "fund:issuer:rhodolite": "forge script FundIssuer --broadcast --sig \"run(address)\" --rpc-url https://rpc.rhodolitechain.com -vvv $(jq -r '.[\"17420\"].address' worlds.json)",
-    "fund:paymaster:rhodolite": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url https://rpc.rhodolitechain.com -vvv $(jq -r '.[\"17420\"].address' worlds.json)"
+    "fund:paymaster:rhodolite": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url https://rpc.rhodolitechain.com -vvv $(jq -r '.[\"17420\"].address' worlds.json)",
+    "fund:paymaster:garnet": "forge script FundPaymaster --broadcast --sig \"run(address)\" --rpc-url https://rpc.garnetchain.com -vvv $(jq -r '.[\"17069\"].address' worlds.json)",
+    "fund:issuer:garnet": "forge script FundIssuer --broadcast --sig \"run(address)\" --rpc-url https://rpc.garnetchain.com -vvv $(jq -r '.[\"17069\"].address' worlds.json)"
   },
   "dependencies": {
     "@latticexyz/cli": "2.2.11-main-916aa8b346f98a490fee1c25119e91d94ee18ef6",
