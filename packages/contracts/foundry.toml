@@ -29,4 +29,4 @@ eth_rpc_url = "https://rpc.garnetchain.com"
 eth_rpc_url = "https://rpc.redstonechain.com"
 
 [profile.rhodolite]
-eth_rpc_url = "http://79.127.239.88:58545"
+eth_rpc_url = "https://rpc.rhodolitechain.com"
