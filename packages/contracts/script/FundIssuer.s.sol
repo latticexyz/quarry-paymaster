@@ -5,6 +5,8 @@ import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 import { IEntryPoint } from "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
+import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOwner.sol";
+import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
 
 import { IWorld } from "../src/codegen/world/IWorld.sol";
 import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
@@ -22,11 +24,22 @@ contract FundIssuer is Script {
     IWorld paymaster = IWorld(worldAddress);
     bytes32 passId = bytes32(uint256(1));
 
+    // Check the World owner
+    address owner = NamespaceOwner.get(ROOT_NAMESPACE_ID);
+    console.log("Paymaster owner:", owner);
+
+    // Check the pass owner
+    address passOwner = PassConfig.getGrantor(passId);
+    console.log("Pass owner:", passOwner);
+
     // Start broadcasting transactions from the deployer account
     vm.startBroadcast(deployerPrivateKey);
 
     // Set a grant allowance for the paymaster service to grant allowance to users
     paymaster.setGrantAllowance(issuerAddress, 999999 ether);
+
+    // Reset pass owner
+    PassConfig.setGrantor(passId, address(0));
 
     // Register pass to issue to users
     paymaster.registerPass({
