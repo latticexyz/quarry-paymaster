@@ -3,6 +3,7 @@ import { rhodolite } from "./rhodolite";
 import { Chain } from "viem";
 import worlds from "contracts/worlds.json";
 import env from "./env";
+import { garnet } from "./garnet";
 
 const anvilWithPaymaster = {
   ...anvil,
@@ -20,7 +21,7 @@ const anvilWithPaymaster = {
   },
 } satisfies Chain;
 
-const supportedChains = [anvilWithPaymaster, rhodolite];
+const supportedChains = [anvilWithPaymaster, rhodolite, garnet];
 
 const chain = supportedChains.find((c) => c.id === Number(env.CHAIN_ID))!;
 if (!chain) {
