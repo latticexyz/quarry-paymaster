@@ -4,25 +4,18 @@ pragma solidity >=0.8.24;
 import "forge-std/Test.sol";
 import { MudTest } from "@latticexyz/world/test/MudTest.t.sol";
 import { EntryPoint, IEntryPoint } from "@account-abstraction/contracts/core/EntryPoint.sol";
-import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import { SimpleAccountFactory, SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccountFactory.sol";
-import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
 import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOwner.sol";
 
-import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.sol";
-import { Allowance } from "../src/namespaces/root/codegen/tables/Allowance.sol";
-import { Grantor } from "../src/namespaces/root/codegen/tables/Grantor.sol";
-import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
 import { Balance } from "../src/namespaces/root/codegen/tables/Balance.sol";
-import { TestCounter } from "./utils/TestCounter.sol";
+import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
 import { IWorld } from "../src/codegen/world/IWorld.sol";
 
 contract BalanceTest is MudTest {
   EntryPoint entryPoint;
   SimpleAccountFactory accountFactory;
   IWorld paymaster;
-  TestCounter counter;
 
   address payable beneficiary;
   address user;
@@ -34,7 +27,6 @@ contract BalanceTest is MudTest {
     entryPoint = new EntryPoint();
     accountFactory = new SimpleAccountFactory(entryPoint);
     paymaster = IWorld(worldAddress);
-    counter = new TestCounter();
 
     beneficiary = payable(makeAddr("beneficiary"));
     (user, userKey) = makeAddrAndKey("user");
