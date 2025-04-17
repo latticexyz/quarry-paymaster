@@ -14,7 +14,12 @@ import { recoverCallWithSignature } from "../utils/recoverCallWithSignature.sol"
 uint256 constant FIXED_POST_OP_GAS = 60_000;
 
 contract PaymasterSystem is System, IPaymaster {
-  error PaymasterSystem_InsufficientBalance(address user, uint256 available, uint256 required);
+  error PaymasterSystem_InsufficientFunds(
+    address user,
+    uint256 maxCost,
+    uint256 availableAllowance,
+    uint256 availableBalance
+  );
   error PaymasterSystem_OnlyEntryPoint();
 
   /**
@@ -51,7 +56,7 @@ contract PaymasterSystem is System, IPaymaster {
       fromBalance = fromAllowance - availableAllowance;
       uint256 availableBalance = Balance._get(user);
       if (fromBalance > availableBalance) {
-        revert PaymasterSystem_InsufficientBalance(user, availableBalance, fromBalance);
+        revert PaymasterSystem_InsufficientFunds(user, maxCost, availableAllowance, availableBalance);
       }
       fromAllowance -= fromBalance;
       Balance._set(user, availableBalance - fromBalance);
