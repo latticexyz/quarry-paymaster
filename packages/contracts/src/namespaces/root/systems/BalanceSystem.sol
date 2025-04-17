@@ -32,6 +32,7 @@ contract BalanceSystem is System {
       revert BalanceSystem_InsufficientBalance(user, amount, balance);
     }
 
+    Balance._set(user, balance - amount);
     IEntryPoint(SystemConfig.getEntryPoint()).withdrawTo(to, amount);
   }
 }
