@@ -93,7 +93,7 @@ contract PaymasterTest is MudTest {
 
     expectUserOpRevert(
       abi.encodeWithSelector(
-        PaymasterSystem.PaymasterSystem_InsufficientAllowance.selector,
+        PaymasterSystem.PaymasterSystem_InsufficientBalance.selector,
         address(account),
         uint256(0),
         uint256(380000000000000)
@@ -157,7 +157,7 @@ contract PaymasterTest is MudTest {
     // Expect the call to fail while the account is not a spender of the user
     expectUserOpRevert(
       abi.encodeWithSelector(
-        PaymasterSystem.PaymasterSystem_InsufficientAllowance.selector,
+        PaymasterSystem.PaymasterSystem_InsufficientBalance.selector,
         account,
         uint256(0),
         uint256(380000000000000)

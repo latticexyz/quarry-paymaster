@@ -12,7 +12,7 @@ import { IPaymaster } from "@account-abstraction/contracts/interfaces/IPaymaster
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IPaymasterSystem {
-  error PaymasterSystem_InsufficientAllowance(address user, uint256 available, uint256 required);
+  error PaymasterSystem_InsufficientBalance(address user, uint256 available, uint256 required);
   error PaymasterSystem_OnlyEntryPoint();
 
   function validatePaymasterUserOp(

@@ -6,12 +6,13 @@ import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/P
 import { System } from "@latticexyz/world/src/System.sol";
 
 import { Allowance } from "../codegen/tables/Allowance.sol";
+import { Balance } from "../codegen/tables/Balance.sol";
 import { Spender } from "../codegen/tables/Spender.sol";
 import { SystemConfig } from "../codegen/tables/SystemConfig.sol";
 import { recoverCallWithSignature } from "../utils/recoverCallWithSignature.sol";
 
 contract PaymasterSystem is System, IPaymaster {
-  error PaymasterSystem_InsufficientAllowance(address user, uint256 available, uint256 required);
+  error PaymasterSystem_InsufficientBalance(address user, uint256 available, uint256 required);
   error PaymasterSystem_OnlyEntryPoint();
 
   /**
@@ -41,16 +42,22 @@ contract PaymasterSystem is System, IPaymaster {
 
     address user = _getUser(userOp);
     uint256 availableAllowance = Allowance._get(user);
+    uint256 fromAllowance = maxCost;
+    uint256 fromBalance = 0;
 
-    // TODO: allow taking from the user balance
-
-    if (availableAllowance < maxCost) {
-      revert PaymasterSystem_InsufficientAllowance(user, availableAllowance, maxCost);
+    if (fromAllowance > availableAllowance) {
+      fromBalance = fromAllowance - availableAllowance;
+      uint256 availableBalance = Balance._get(user);
+      if (fromBalance > availableBalance) {
+        revert PaymasterSystem_InsufficientBalance(user, availableBalance, fromBalance);
+      }
+      fromAllowance -= fromBalance;
+      Balance._set(user, availableBalance - fromBalance);
     }
 
     Allowance._set(user, availableAllowance - maxCost);
 
-    context = abi.encode(user, maxCost);
+    context = abi.encode(user, fromAllowance, fromBalance);
   }
 
   /**
@@ -61,7 +68,7 @@ contract PaymasterSystem is System, IPaymaster {
    *                        opReverted  - User op reverted. The paymaster still has to pay for gas.
    *                        postOpReverted - never passed in a call to postOp().
    * @param context       - The context value returned by validatePaymasterUserOp
-   * @param actualGasCost - Actual gas used so far (without this postOp call).
+   * @param actualGasCost - Actual cost of gas used so far (without this postOp call).
    * @param actualUserOpFeePerGas - the gas price this UserOp pays. This value is based on the UserOp's maxFeePerGas
    *                        and maxPriorityFee (and basefee)
    *                        It is not the same as tx.gasprice, which is what the bundler pays.
@@ -74,11 +81,25 @@ contract PaymasterSystem is System, IPaymaster {
   ) public override {
     _requireFromEntryPoint();
 
-    (address user, uint256 maxCost) = abi.decode(context, (address, uint256));
+    (address user, uint256 fromAllowance, uint256 fromBalance) = abi.decode(context, (address, uint256, uint256));
 
-    // Refund the unused cost
-    uint256 currentAllowance = Allowance._get(user);
-    Allowance._set(user, currentAllowance + maxCost - actualGasCost);
+    uint256 toAllowance;
+    uint256 toBalance;
+
+    if (actualGasCost > fromAllowance) {
+      toBalance = fromAllowance + fromBalance - actualGasCost;
+    } else {
+      toAllowance = fromAllowance - actualGasCost;
+      toBalance = fromBalance;
+    }
+
+    if (toBalance > 0) {
+      Balance._set(user, Balance._get(user) + toBalance);
+    }
+
+    if (toAllowance > 0) {
+      Allowance._set(user, Allowance._get(user) + toAllowance);
+    }
   }
 
   /**
