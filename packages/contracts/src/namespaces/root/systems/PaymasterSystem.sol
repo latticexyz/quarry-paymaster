@@ -42,6 +42,8 @@ contract PaymasterSystem is System, IPaymaster {
     address user = _getUser(userOp);
     uint256 availableAllowance = Allowance._get(user);
 
+    // TODO: allow taking from the user balance
+
     if (availableAllowance < maxCost) {
       revert PaymasterSystem_InsufficientAllowance(user, availableAllowance, maxCost);
     }

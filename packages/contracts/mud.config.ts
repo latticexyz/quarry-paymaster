@@ -5,6 +5,15 @@ const config = defineWorld({
     root: {
       namespace: "",
       tables: {
+        // Balance gets deposited and is withdrawable
+        Balance: {
+          schema: {
+            user: "address",
+            balance: "uint256",
+          },
+          key: ["user"],
+        },
+        // Allowance gets granted and is not withdrawable
         Allowance: {
           schema: {
             user: "address",
