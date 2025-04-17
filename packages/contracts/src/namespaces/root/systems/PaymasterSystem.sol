@@ -11,6 +11,8 @@ import { Spender } from "../codegen/tables/Spender.sol";
 import { SystemConfig } from "../codegen/tables/SystemConfig.sol";
 import { recoverCallWithSignature } from "../utils/recoverCallWithSignature.sol";
 
+uint256 constant FIXED_POST_OP_GAS = 60_000;
+
 contract PaymasterSystem is System, IPaymaster {
   error PaymasterSystem_InsufficientBalance(address user, uint256 available, uint256 required);
   error PaymasterSystem_OnlyEntryPoint();
@@ -83,13 +85,14 @@ contract PaymasterSystem is System, IPaymaster {
 
     (address user, uint256 fromAllowance, uint256 fromBalance) = abi.decode(context, (address, uint256, uint256));
 
+    uint256 totalGasCost = actualGasCost + FIXED_POST_OP_GAS * actualUserOpFeePerGas;
     uint256 toAllowance;
     uint256 toBalance;
 
-    if (actualGasCost > fromAllowance) {
-      toBalance = fromAllowance + fromBalance - actualGasCost;
+    if (totalGasCost > fromAllowance) {
+      toBalance = fromAllowance + fromBalance - totalGasCost;
     } else {
-      toAllowance = fromAllowance - actualGasCost;
+      toAllowance = fromAllowance - totalGasCost;
       toBalance = fromBalance;
     }
 

@@ -12,6 +12,7 @@ import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOw
 
 import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.sol";
 import { Allowance } from "../src/namespaces/root/codegen/tables/Allowance.sol";
+import { Balance } from "../src/namespaces/root/codegen/tables/Balance.sol";
 import { Grantor } from "../src/namespaces/root/codegen/tables/Grantor.sol";
 import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
 import { TestCounter } from "./utils/TestCounter.sol";
@@ -130,8 +131,55 @@ contract PaymasterTest is MudTest {
     assertGt(beneficiary.balance, 0);
     assertEq(beneficiary.balance, feePaidByPaymaster);
     assertGt(feePaidByUser, 0);
-    // The fee paid by the user doesn't include the `postOp` cost
-    assertLt(feePaidByUser, feePaidByPaymaster);
+    assertGt(feePaidByUser, feePaidByPaymaster);
+  }
+
+  function testCallWithPaymaster_PartialAllowanceAndBalance() external {
+    vm.deal(address(account), 1e18);
+    PackedUserOperation memory op = fillUserOp(
+      account,
+      userKey,
+      address(counter),
+      0,
+      abi.encodeWithSelector(TestCounter.count.selector)
+    );
+
+    op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(100000), uint128(100000));
+    op.signature = signUserOp(op, userKey);
+
+    // Grant partial allowance that's not enough to cover the full cost
+    uint256 partialAllowance = 10_000; // About half of the required amount
+    vm.prank(grantor);
+    paymaster.grantAllowance(address(account), partialAllowance);
+    assertEq(Grantor.getAllowance(grantor), grantAllowance - partialAllowance);
+    assertEq(Allowance.get(address(account)), partialAllowance);
+
+    // Deposit a balance that's more than enough to cover the entire cost
+    uint256 balanceDeposit = 0.1 ether; // More than enough to cover the full cost
+    vm.deal(address(account), balanceDeposit);
+    vm.prank(address(account));
+    paymaster.depositTo{ value: balanceDeposit }(address(account));
+    assertEq(Balance.get(address(account)), balanceDeposit);
+
+    // Expect the user op to succeed with partial payment from both allowance and balance
+    uint256 paymasterBalance = entryPoint.balanceOf(address(paymaster));
+    assertEq(beneficiary.balance, 0);
+    submitUserOp(op);
+    uint256 feePaidByPaymaster = paymasterBalance - entryPoint.balanceOf(address(paymaster));
+    uint256 remainingAllowance = Allowance.get(address(account));
+    uint256 remainingBalance = Balance.get(address(account));
+
+    // Verify that allowance was fully depleted before balance was used
+    assertEq(remainingAllowance, 0, "Allowance should be fully depleted");
+    assertLt(remainingBalance, balanceDeposit, "Balance should be reduced");
+    assertGt(beneficiary.balance, 0);
+    assertEq(beneficiary.balance, feePaidByPaymaster);
+
+    // Calculate how much was taken from balance
+    uint256 balanceUsed = balanceDeposit - remainingBalance;
+    uint256 totalCost = partialAllowance + balanceUsed;
+    assertGt(totalCost, partialAllowance, "Total cost should be more than the allowance");
+    assertGt(totalCost, feePaidByPaymaster, "Total cost should be more than the fee paid by the paymaster");
   }
 
   function testCallWithSpender() external {
@@ -178,8 +226,7 @@ contract PaymasterTest is MudTest {
     assertGt(beneficiary.balance, 0);
     assertEq(beneficiary.balance, feePaidByPaymaster);
     assertGt(feePaidByUser, 0);
-    // The fee paid by the user doesn't include the `postOp` cost
-    assertLt(feePaidByUser, feePaidByPaymaster);
+    assertGt(feePaidByUser, feePaidByPaymaster);
   }
 
   function fillUserOp(
