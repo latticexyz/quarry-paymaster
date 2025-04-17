@@ -3,8 +3,8 @@ pragma solidity >=0.8.24;
 
 import { WorldContextConsumerLib } from "@latticexyz/world/src/WorldContext.sol";
 import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
-import { Unstable_CallWithSignatureSystem } from "@latticexyz/world-modules/src/modules/callwithsignature/Unstable_CallWithSignatureModule.sol";
-import { validateCallWithSignature } from "@latticexyz/world-modules/src/modules/callwithsignature/validateCallWithSignature.sol";
+import { CallWithSignatureSystem } from "@latticexyz/world-module-callwithsignature/src/CallWithSignatureModule.sol";
+import { validateCallWithSignature } from "@latticexyz/world-module-callwithsignature/src/validateCallWithSignature.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { SimpleAccount } from "@account-abstraction/contracts/samples/SimpleAccount.sol";
 
@@ -26,7 +26,7 @@ function recoverCallWithSignature(PackedUserOperation calldata userOp) view retu
   bytes calldata executeCallData = getExecuteCallData(userOp);
 
   // Require the target of this `execute` call to be `callWithSignature`
-  if (getFunctionSelector(executeCallData) != Unstable_CallWithSignatureSystem.callWithSignature.selector) {
+  if (getFunctionSelector(executeCallData) != CallWithSignatureSystem.callWithSignature.selector) {
     return address(0);
   }
 

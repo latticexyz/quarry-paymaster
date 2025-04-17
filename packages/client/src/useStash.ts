@@ -1,4 +1,4 @@
-import { Stash, State, StoreConfig, subscribeStore } from "@latticexyz/stash/internal";
+import { Stash, State, StoreConfig, subscribeStash } from "@latticexyz/stash/internal";
 import { useEffect, useRef, useState } from "react";
 
 // TODO: move to @latticexyz/stash
@@ -18,7 +18,7 @@ export function useStash<config extends StoreConfig, T>(
         forceUpdate({});
       }
     }
-    return subscribeStore({ stash, subscriber: syncState });
+    return subscribeStash({ stash, subscriber: syncState });
   }, [equals, selector, stash]);
 
   return state.current;

@@ -39,7 +39,7 @@ export function wiresaw<const transport extends Transport>(originalTransport: tr
         }
 
         if (req.method === "eth_getTransactionReceipt") {
-          const hash = req.params[0] as Hash;
+          const hash = (req.params as [Hash])[0];
           const receipt = receipts.get(hash) ?? ((await originalRequest(req)) as RpcTransactionReceipt);
 
           if (!receipts.has(hash)) receipts.set(hash, receipt);

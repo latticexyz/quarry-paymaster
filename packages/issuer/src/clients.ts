@@ -1,4 +1,4 @@
-import { createPublicClient, http, ClientConfig, PublicClient, Hex, HttpTransport } from "viem";
+import { createPublicClient, http, ClientConfig, Hex, HttpTransport } from "viem";
 import { createBurnerAccount } from "@latticexyz/common";
 import { createBundlerClient, entryPoint07Address, SmartAccount } from "viem/account-abstraction";
 import { toSimpleSmartAccount } from "permissionless/accounts";
@@ -13,7 +13,7 @@ const clientOptions = {
   pollingInterval: chain.id === 31337 ? 100 : 500,
 } as const satisfies ClientConfig;
 
-export const publicClient: PublicClient = createPublicClient(clientOptions);
+export const publicClient = createPublicClient(clientOptions);
 
 // export const bundlerTransport = wiresaw(http(chain.rpcUrls.bundler.http[0]));
 export const bundlerTransport = http(chain.rpcUrls.bundler.http[0]);

@@ -60,13 +60,6 @@ const config = defineWorld({
       filePath: "@latticexyz/store/src/ResourceId.sol",
     },
   },
-  modules: [
-    {
-      artifactPath:
-        "@latticexyz/world-modules/out/Unstable_CallWithSignatureModule.sol/Unstable_CallWithSignatureModule.json",
-      root: true,
-    },
-  ],
 });
 
 export default config;
