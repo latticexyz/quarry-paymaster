@@ -55,7 +55,7 @@ contract PaymasterSystem is System, IPaymaster {
       Balance._set(user, availableBalance - fromBalance);
     }
 
-    Allowance._set(user, availableAllowance - maxCost);
+    Allowance._set(user, availableAllowance - fromAllowance);
 
     context = abi.encode(user, fromAllowance, fromBalance);
   }
