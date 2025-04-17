@@ -23,7 +23,7 @@
 - Users can maintain a balance in the paymaster contract, up to a maximum of 0.1 ETH
 - The balance can be used as a fallback when paying for user operations if the allowance is insufficient
 - Users can deposit to and withdraw from their balance at any time
-- The advantage of maintaining a balance in the paymaster over a balance in individual accounts is that multiple spenders (ie session accounts) can share the same balance
+- The advantage of maintaining a balance in the paymaster over a balance in individual accounts is that multiple spenders (i.e. session accounts) can share the same balance
 - See [`BalanceSystem.sol`](./packages/contracts/src/namespaces/root/systems/BalanceSystem.sol)
 
 ### Grantor
