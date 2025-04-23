@@ -91,22 +91,32 @@ contract PaymasterSystem is System, IPaymaster {
     (address user, uint256 fromAllowance, uint256 fromBalance) = abi.decode(context, (address, uint256, uint256));
 
     uint256 totalGasCost = actualGasCost + FIXED_POST_OP_GAS * actualUserOpFeePerGas;
-    uint256 toAllowance;
-    uint256 toBalance;
+    int256 toAllowance;
+    int256 toBalance;
 
     if (totalGasCost > fromAllowance) {
-      toBalance = fromAllowance + fromBalance - totalGasCost;
+      toBalance = int256(fromAllowance + fromBalance) - int256(totalGasCost);
     } else {
-      toAllowance = fromAllowance - totalGasCost;
-      toBalance = fromBalance;
+      toAllowance = int256(fromAllowance) - int256(totalGasCost);
+      toBalance = int256(fromBalance);
     }
 
-    if (toBalance > 0) {
-      Balance._set(user, Balance._get(user) + toBalance);
+    if (toBalance != 0) {
+      uint256 currentBalance = Balance._get(user);
+      int256 newBalance = int256(currentBalance) + toBalance;
+      if (newBalance < 0) {
+        revert PaymasterSystem_InsufficientFunds(user, totalGasCost, Allowance.get(user), currentBalance);
+      }
+      Balance._set(user, uint256(newBalance));
     }
 
-    if (toAllowance > 0) {
-      Allowance._set(user, Allowance._get(user) + toAllowance);
+    if (toAllowance != 0) {
+      uint256 currentAllowance = Allowance._get(user);
+      int256 newAllowance = int256(currentAllowance) + toAllowance;
+      if (newAllowance < 0) {
+        revert PaymasterSystem_InsufficientFunds(user, totalGasCost, currentAllowance, Balance._get(user));
+      }
+      Allowance._set(user, uint256(newAllowance));
     }
   }
 
