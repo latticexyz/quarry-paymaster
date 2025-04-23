@@ -91,32 +91,34 @@ contract PaymasterSystem is System, IPaymaster {
     (address user, uint256 fromAllowance, uint256 fromBalance) = abi.decode(context, (address, uint256, uint256));
 
     uint256 totalGasCost = actualGasCost + FIXED_POST_OP_GAS * actualUserOpFeePerGas;
-    int256 toAllowance;
-    int256 toBalance;
+    uint256 allowanceRefund; // always non-negative
+    int256 balanceDiff; // may be negative if FIXED_POST_OP_GAS made the real cost exceed the deducted balance+allowance
 
     if (totalGasCost > fromAllowance) {
-      toBalance = int256(fromAllowance + fromBalance) - int256(totalGasCost);
+      // If FIXED_POST_OP_GAS made the total cost exceed the deducted balance+allowance,
+      // we attempt to deduct the missing amount from the balance below.
+      balanceDiff = int256(fromAllowance + fromBalance) - int256(totalGasCost);
     } else {
-      toAllowance = int256(fromAllowance) - int256(totalGasCost);
-      toBalance = int256(fromBalance);
+      allowanceRefund = fromAllowance - totalGasCost;
+      balanceDiff = int256(fromBalance);
     }
 
-    if (toBalance != 0) {
+    if (balanceDiff != 0) {
       uint256 currentBalance = Balance._get(user);
-      int256 newBalance = int256(currentBalance) + toBalance;
+      int256 newBalance = int256(currentBalance) + balanceDiff;
       if (newBalance < 0) {
-        revert PaymasterSystem_InsufficientFunds(user, totalGasCost, Allowance.get(user), currentBalance);
+        revert PaymasterSystem_InsufficientFunds(
+          user,
+          totalGasCost,
+          Allowance._get(user) + fromAllowance,
+          currentBalance + fromBalance
+        );
       }
       Balance._set(user, uint256(newBalance));
     }
 
-    if (toAllowance != 0) {
-      uint256 currentAllowance = Allowance._get(user);
-      int256 newAllowance = int256(currentAllowance) + toAllowance;
-      if (newAllowance < 0) {
-        revert PaymasterSystem_InsufficientFunds(user, totalGasCost, currentAllowance, Balance._get(user));
-      }
-      Allowance._set(user, uint256(newAllowance));
+    if (allowanceRefund > 0) {
+      Allowance._set(user, Allowance._get(user) + allowanceRefund);
     }
   }
 
