@@ -5,8 +5,26 @@
 ### Paymaster
 
 - The world acts as an ERC4337 paymaster. Currently it's compatible with EntryPoint 0.7.
-- The paymaster pays for user operations if the user has sufficient allowance. The allowance is tracked in the `Allowance` table. After paying for the user operation, the gas paid is deducted from the user's allowance.
+- The paymaster pays for user operations using a combination of the user's allowance and balance:
+  - First, it attempts to pay from the user's allowance
+  - If the allowance is insufficient, it falls back to using the user's balance
+  - If both are insufficient, the operation is rejected
+- After paying for the user operation, any unused funds are returned to their respective sources (allowance or balance)
 - See [`PaymasterSystem.sol`](./packages/contracts/src/namespaces/root/systems/PaymasterSystem.sol).
+
+### Allowance
+
+- Allowances are the primary source of funds for paying user operations
+- If the allowance is insufficient, the paymaster will attempt to take the missing funds from the user's balance
+- Allowances are granted and can only be spent on gas - they cannot be withdrawn or converted to withdrawable balance
+
+### Balance
+
+- Users can maintain a balance in the paymaster contract, up to a maximum of 0.1 ETH
+- The balance can be used as a fallback when paying for user operations if the allowance is insufficient
+- Users can deposit to and withdraw from their balance at any time
+- The advantage of maintaining a balance in the paymaster over a balance in individual accounts is that multiple spenders (i.e. session accounts) can share the same balance
+- See [`BalanceSystem.sol`](./packages/contracts/src/namespaces/root/systems/BalanceSystem.sol)
 
 ### Grantor
 

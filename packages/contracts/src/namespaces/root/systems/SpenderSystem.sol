@@ -5,6 +5,7 @@ import { System } from "@latticexyz/world/src/System.sol";
 
 import { Spender } from "../codegen/tables/Spender.sol";
 import { Allowance } from "../codegen/tables/Allowance.sol";
+import { Balance } from "../codegen/tables/Balance.sol";
 
 contract SpenderSystem is System {
   error SpenderSystem_AlreadyRegistered(address spender, address user);
@@ -25,7 +26,7 @@ contract SpenderSystem is System {
     // Require the spender account to not have own balance.
     // A spender always spends from the user allowance, so registering an
     // account with own allowance as spender would lock its allowance.
-    if (Allowance._get(spender) > 0) {
+    if (Allowance._get(spender) > 0 || Balance._get(spender) > 0) {
       revert SpenderSystem_HasOwnBalance(spender);
     }
 
