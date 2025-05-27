@@ -69,6 +69,9 @@ const config = defineWorld({
       filePath: "@latticexyz/store/src/ResourceId.sol",
     },
   },
+  deploy: {
+    upgradeableWorldImplementation: true,
+  },
 });
 
 export default config;
