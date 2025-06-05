@@ -120,6 +120,9 @@ importers:
       '@latticexyz/cli':
         specifier: 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6
         version: 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@tanstack/react-query@5.59.0)(react@18.3.1)(typescript@5.4.2)(wagmi@2.12.11)
+      '@latticexyz/entrykit':
+        specifier: 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6
+        version: 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@tanstack/react-query@5.59.0)(react-dom@18.3.1)(react@18.3.1)(typescript@5.4.2)(viem@2.23.2)(wagmi@2.12.11)(zod@3.23.8)
       '@latticexyz/schema-type':
         specifier: 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6
         version: 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
@@ -258,7 +261,6 @@ packages:
     dependencies:
       '@openzeppelin/contracts': 5.0.2
       '@uniswap/v3-periphery': 1.4.4
-    dev: true
 
   /@adraffy/ens-normalize@1.11.0:
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
@@ -3124,6 +3126,53 @@ packages:
       - typescript
       - zod
 
+  /@latticexyz/entrykit@2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@tanstack/react-query@5.59.0)(react-dom@18.3.1)(react@18.3.1)(typescript@5.4.2)(viem@2.23.2)(wagmi@2.12.11)(zod@3.23.8):
+    resolution: {integrity: sha512-oddkyJiRAhLDvMUenAI/meoTEH4HwVbk8n3W45QSbJ3r/PO2QnOYIe1QWc8AnFZQSzqMi2WB6pup8sG5X/HiYA==}
+    hasBin: true
+    peerDependencies:
+      '@tanstack/react-query': 5.x
+      react: 18.x || 19.x
+      react-dom: 18.x || 19.x
+      viem: 2.x
+      wagmi: 2.x
+    dependencies:
+      '@account-abstraction/contracts': 0.7.0
+      '@ark/util': 0.2.2
+      '@latticexyz/common': 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@aws-sdk/client-kms@3.666.0)(asn1.js@5.4.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
+      '@latticexyz/config': 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@aws-sdk/client-kms@3.666.0)(asn1.js@5.4.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
+      '@latticexyz/paymaster': 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6
+      '@latticexyz/protocol-parser': 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@aws-sdk/client-kms@3.666.0)(asn1.js@5.4.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
+      '@latticexyz/store': 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@aws-sdk/client-kms@3.666.0)(asn1.js@5.4.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
+      '@latticexyz/world': 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@aws-sdk/client-kms@3.666.0)(asn1.js@5.4.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
+      '@latticexyz/world-module-callwithsignature': 2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@aws-sdk/client-kms@3.666.0)(asn1.js@5.4.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
+      '@radix-ui/react-dialog': 1.1.2(@types/react-dom@18.2.7)(@types/react@18.2.22)(react-dom@18.3.1)(react@18.3.1)
+      '@rainbow-me/rainbowkit': 2.1.7(@tanstack/react-query@5.59.0)(@types/react@18.2.22)(react-dom@18.3.1)(react@18.3.1)(viem@2.23.2)(wagmi@2.12.11)
+      '@tanstack/react-query': 5.59.0(react@18.3.1)
+      debug: 4.3.7
+      dotenv: 16.4.5
+      permissionless: 0.2.30(viem@2.23.2)(webauthn-p256@0.0.10)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-error-boundary: 5.0.0(react@18.3.1)
+      react-merge-refs: 2.1.1
+      tailwind-merge: 1.14.0
+      usehooks-ts: 3.1.1(react@18.3.1)
+      viem: 2.23.2(typescript@5.4.2)(zod@3.23.8)
+      wagmi: 2.12.11(@tanstack/react-query@5.59.0)(@types/react@18.2.22)(react-dom@18.3.1)(react-native@0.75.4)(react@18.3.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8)
+      webauthn-p256: 0.0.10
+      zustand: 4.5.5(@types/react@18.2.22)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@aws-sdk/client-kms'
+      - '@types/react'
+      - '@types/react-dom'
+      - asn1.js
+      - babel-plugin-macros
+      - immer
+      - supports-color
+      - typescript
+      - zod
+    dev: false
+
   /@latticexyz/explorer@2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@babel/core@7.25.7)(@types/react-dom@18.2.7)(@types/react@18.2.22)(react-native@0.75.4)(typescript@5.4.2)(viem@2.23.2):
     resolution: {integrity: sha512-Pzg9/R12svUsotNeQXwAJ/AWvlF8WCAsv2DeMAFxi8ndKJBuy7VGfaLo8nyLrgfGk5d5Q0P77F114t27/Wf/Jw==}
     engines: {node: 20.x, pnpm: ^9}
@@ -3341,6 +3390,10 @@ packages:
       strip-ansi: 7.1.0
       table: 6.8.2
       yargs: 17.7.2
+
+  /@latticexyz/paymaster@2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6:
+    resolution: {integrity: sha512-r9lAh822QHIqRltUsOmC6+a5T+gUpi7hkgcqm1VnzPVY19Xif9aPGV9A2Eav6d5Om1dmN4/TOVPJzRCuJSa9Ow==}
+    dev: false
 
   /@latticexyz/protocol-parser@2.2.22-88ddd0c3a68c52469abbc59c2f9db3bbee2eafb6(@aws-sdk/client-kms@3.666.0)(asn1.js@5.4.1)(typescript@5.4.2)(viem@2.23.2)(zod@3.23.8):
     resolution: {integrity: sha512-+vz84eC0dm5sCQvAyv+oi0+yp71D7N1uPJUd9r5yaoJPPB3zzXBZFd9x1G0WuUMfa7TGPN/dyCGx3NCd3A5lEQ==}
@@ -4237,11 +4290,9 @@ packages:
 
   /@openzeppelin/contracts@3.4.2-solc-0.7:
     resolution: {integrity: sha512-W6QmqgkADuFcTLzHL8vVoNBtkwjvQRpYIAom7KiUNoLKghyx3FgH0GBjt8NRvigV1ZmMOBllvE1By1C+bi8WpA==}
-    dev: true
 
   /@openzeppelin/contracts@5.0.2:
     resolution: {integrity: sha512-ytPc6eLGcHHnapAZ9S+5qsdomhjo6QBHTDRRBFfTxXIpsicMhVPouPgmUPebZZZGX7vt9USA+Z+0M0dSVtSUEA==}
-    dev: true
 
   /@parcel/watcher-android-arm64@2.4.1:
     resolution: {integrity: sha512-LOi/WTbbh3aTn2RYddrO8pnapixAziFl6SMxHM69r3tvdSm94JtCenaKgk1GRg5FJ5wpMCpHeW+7yqPlvZv7kg==}
@@ -7912,17 +7963,14 @@ packages:
   /@uniswap/lib@4.0.1-alpha:
     resolution: {integrity: sha512-f6UIliwBbRsgVLxIaBANF6w09tYqc6Y/qXdsrbEmXHyFA7ILiKrIwRFXe1yOg8M3cksgVsO9N7yuL2DdCGQKBA==}
     engines: {node: '>=10'}
-    dev: true
 
   /@uniswap/v2-core@1.0.1:
     resolution: {integrity: sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==}
     engines: {node: '>=10'}
-    dev: true
 
   /@uniswap/v3-core@1.0.1:
     resolution: {integrity: sha512-7pVk4hEm00j9tc71Y9+ssYpO6ytkeI0y7WE9P6UcmNzhxPePwyAxImuhVsTqWK9YFvzgtvzJHi64pBl4jUzKMQ==}
     engines: {node: '>=10'}
-    dev: true
 
   /@uniswap/v3-periphery@1.4.4:
     resolution: {integrity: sha512-S4+m+wh8HbWSO3DKk4LwUCPZJTpCugIsHrWR86m/OrUyvSqGDTXKFfc2sMuGXCZrD1ZqO3rhQsKgdWg3Hbb2Kw==}
@@ -7933,7 +7981,6 @@ packages:
       '@uniswap/v2-core': 1.0.1
       '@uniswap/v3-core': 1.0.1
       base64-sol: 1.0.1
-    dev: true
 
   /@vanilla-extract/css@1.15.5:
     resolution: {integrity: sha512-N1nQebRWnXvlcmu9fXKVUs145EVwmWtMD95bpiEKtvehHDpUhmO1l2bauS7FGYKbi3dU1IurJbGpQhBclTr1ng==}
@@ -8736,7 +8783,6 @@ packages:
 
   /base64-sol@1.0.1:
     resolution: {integrity: sha512-ld3cCNMeXt4uJXmLZBHFGMvVpK9KsLVEhPpFRXnvSVAqABKbuNZg/+dsq3NuM+wxFLb/UrVkz7m1ciWmkMfTbg==}
-    dev: true
 
   /better-sqlite3@8.7.0:
     resolution: {integrity: sha512-99jZU4le+f3G6aIl6PmmV0cxUIWqKieHxsiF7G34CVFiE+/UabpYqkU0NJIkY/96mQKikHeBjtR27vFfs5JpEw==}
@@ -12425,6 +12471,16 @@ packages:
   /pathe@1.1.2:
     resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
 
+  /permissionless@0.2.30(viem@2.23.2)(webauthn-p256@0.0.10):
+    resolution: {integrity: sha512-9Uzd8vAK6CXuhKrkDPG2aUyXtYXxAdOVnnvaCCCh4jFA1JTwrJcs4vJ930Plva0J74f9LVGfuZxYJrObCM1f3A==}
+    peerDependencies:
+      viem: ^2.21.54
+      webauthn-p256: 0.0.10
+    dependencies:
+      viem: 2.23.2(typescript@5.4.2)(zod@3.23.8)
+      webauthn-p256: 0.0.10
+    dev: false
+
   /permissionless@0.2.6(viem@2.23.2):
     resolution: {integrity: sha512-U4c1N5q8D5vOYdJ4XKvjth8yF959c/bgxukh/VE7gTRiCVEBqq7TIU5rclBrqutvL9eRYH0uauESEOH3JSIAMw==}
     peerDependencies:
@@ -12795,6 +12851,15 @@ packages:
       react: 18.3.1
       scheduler: 0.23.2
 
+  /react-error-boundary@5.0.0(react@18.3.1):
+    resolution: {integrity: sha512-tnjAxG+IkpLephNcePNA7v6F/QpWLH8He65+DmedchDwg162JZqx4NmbXj0mlAYVVEd81OW7aFhmbsScYfiAFQ==}
+    peerDependencies:
+      react: '>=16.13.1'
+    dependencies:
+      '@babel/runtime': 7.25.7
+      react: 18.3.1
+    dev: false
+
   /react-hook-form@7.53.0(react@18.3.1):
     resolution: {integrity: sha512-M1n3HhqCww6S2hxLxciEXy2oISPnAzxY7gvwVPrtlczTM/1dDadXgUxDpHMrMTblDOcm/AXtXxHwZ3jpg1mqKQ==}
     engines: {node: '>=18.0.0'}
@@ -12812,6 +12877,10 @@ packages:
 
   /react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
+
+  /react-merge-refs@2.1.1:
+    resolution: {integrity: sha512-jLQXJ/URln51zskhgppGJ2ub7b2WFKGq3cl3NYKtlHoTG+dN2q7EzWrn3hN3EgPsTMvpR9tpq5ijdp7YwFZkag==}
+    dev: false
 
   /react-native-webview@11.26.1(react-native@0.75.4)(react@18.3.1):
     resolution: {integrity: sha512-hC7BkxOpf+z0UKhxFSFTPAM4shQzYmZHoELa6/8a/MspcjEP7ukYKpuSUTLDywQditT8yI9idfcKvfZDKQExGw==}
@@ -14381,6 +14450,16 @@ packages:
     dependencies:
       react: 18.3.1
 
+  /usehooks-ts@3.1.1(react@18.3.1):
+    resolution: {integrity: sha512-I4diPp9Cq6ieSUH2wu+fDAVQO43xwtulo+fKEidHUwZPnYImbtkTjzIJYcDcJqxgmX31GVqNFURodvcgHcW0pA==}
+    engines: {node: '>=16.15.0'}
+    peerDependencies:
+      react: ^16.8.0  || ^17 || ^18 || ^19 || ^19.0.0-rc
+    dependencies:
+      lodash.debounce: 4.0.8
+      react: 18.3.1
+    dev: false
+
   /utf-8-validate@5.0.10:
     resolution: {integrity: sha512-Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==}
     engines: {node: '>=6.14.2'}
@@ -14555,6 +14634,13 @@ packages:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
     dependencies:
       defaults: 1.0.4
+
+  /webauthn-p256@0.0.10:
+    resolution: {integrity: sha512-EeYD+gmIT80YkSIDb2iWq0lq2zbHo1CxHlQTeJ+KkCILWpVy3zASH3ByD4bopzfk0uCwXxLqKGLqp2W4O28VFA==}
+    dependencies:
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+    dev: false
 
   /webextension-polyfill@0.10.0:
     resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}

@@ -36,7 +36,7 @@ contract FundIssuer is Script {
     vm.startBroadcast(deployerPrivateKey);
 
     // Set a grant allowance for the paymaster service to grant allowance to users
-    paymaster.setGrantAllowance(issuerAddress, 999999 ether);
+    paymaster.setGrantAllowance(issuerAddress, 1 ether);
 
     // Reset pass owner
     PassConfig.setGrantor(passId, address(0));

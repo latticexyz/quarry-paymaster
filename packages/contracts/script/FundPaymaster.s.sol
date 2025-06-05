@@ -14,7 +14,7 @@ contract FundPaymaster is Script {
     StoreSwitch.setStoreAddress(worldAddress);
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
     IEntryPoint entryPoint = IEntryPoint(0x0000000071727De22E5E9d8BAf0edAc6f37da032);
-    uint256 targetBalance = 10 ether;
+    uint256 targetBalance = 1 ether;
     uint256 balance = entryPoint.balanceOf(worldAddress);
     console.log("Current paymaster balance: %s", balance);
     if (balance < targetBalance) {
