@@ -1,5 +1,4 @@
 import { anvil } from "viem/chains";
-import { rhodolite } from "./rhodolite";
 import { Chain } from "viem";
 import paymasters from "contracts/worlds.json";
 
@@ -22,7 +21,7 @@ const anvilWithPaymaster = {
 const params = new URLSearchParams(window.location.search);
 const chainId = Number(params.get("chainId") || params.get("chainid") || import.meta.env.VITE_CHAIN_ID || 31337);
 
-const supportedChains = [anvilWithPaymaster, rhodolite];
+const supportedChains = [anvilWithPaymaster];
 
 const chain = supportedChains.find((c) => c.id === chainId)!;
 if (!chain) {

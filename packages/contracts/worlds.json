@@ -3,19 +3,7 @@
     "address": "0x2d70F1eFFbFD865764CAF19BE2A01a72F3CE774f",
     "blockNumber": 18081086
   },
-  "17069": {
-    "address": "0x0528104d96672dfdF47B92f809A32e7eA11Ee8d9",
-    "blockNumber": 17310131
-  },
-  "17420": {
-    "address": "0x7ca1b85aca23fccf2fbac14c02b5e8a6432639b9",
-    "blockNumber": 25965
-  },
   "31337": {
     "address": "0x8D8b6b8414E1e3DcfD4168561b9be6bD3bF6eC4B"
-  },
-  "695569": {
-    "address": "0xD40C9cFc97b855B2183D7e1c8925edF77C309b85",
-    "blockNumber": 3611625
   }
 }

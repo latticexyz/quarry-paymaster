@@ -30,6 +30,3 @@ eth_rpc_url = "https://rpc.pyropechain.com"
 
 [profile.redstone]
 eth_rpc_url = "https://rpc.redstonechain.com"
-
-[profile.rhodolite]
-eth_rpc_url = "https://rpc.rhodolitechain.com"
