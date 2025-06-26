@@ -6,9 +6,9 @@
   "scripts": {
     "build": "mud build",
     "clean": "forge clean && shx rm -rf src/**/codegen",
+    "deploy:local": "mud deploy",
     "deploy:garnet": "mud deploy --profile=garnet --kms --salt 0x8cb082c6e2eadda817f52368be3c9af5dede5485d33da775b6fa6f4f640a604b",
     "deploy:pyrope": "mud deploy --profile=pyrope --kms --salt 0x8cb082c6e2eadda817f52368be3c9af5dede5485d33da775b6fa6f4f640a604b",
-    "deploy:local": "mud deploy",
     "deploy:redstone": "mud deploy --profile=redstone --kms --salt 0x8cb082c6e2eadda817f52368be3c9af5dede5485d33da775b6fa6f4f640a604b",
     "deploy:dependencies:redstone": "RPC_URL=https://rpc.redstonechain.com entrykit-deploy",
     "deploy:dependencies:garnet": "RPC_URL=https://rpc.garnetchain.com entrykit-deploy",
