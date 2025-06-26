@@ -8,6 +8,7 @@ verbosity = 2
 src = "src"
 test = "test"
 out = "out"
+script_execution_protection = false
 allow_paths = [
   # pnpm symlinks to the project root's node_modules
   "../../node_modules",
@@ -30,6 +31,3 @@ eth_rpc_url = "https://rpc.pyropechain.com"
 
 [profile.redstone]
 eth_rpc_url = "https://rpc.redstonechain.com"
-
-[profile.rhodolite]
-eth_rpc_url = "https://rpc.rhodolitechain.com"
