@@ -9,7 +9,5 @@ pragma solidity >=0.8.24;
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IGrantSystem {
-  error GrantSystem_InsufficientAllowance(address grantor, uint256 available, uint256 required);
-
-  function grantAllowance(address user, uint256 allowance) external;
+  function grantAllowance(address, uint256) external pure;
 }

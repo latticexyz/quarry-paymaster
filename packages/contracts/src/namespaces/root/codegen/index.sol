@@ -5,8 +5,5 @@ pragma solidity >=0.8.24;
 
 import { Balance } from "./tables/Balance.sol";
 import { Allowance } from "./tables/Allowance.sol";
-import { Grantor } from "./tables/Grantor.sol";
-import { PassHolder, PassHolderData } from "./tables/PassHolder.sol";
-import { PassConfig, PassConfigData } from "./tables/PassConfig.sol";
 import { Spender } from "./tables/Spender.sol";
 import { SystemConfig } from "./tables/SystemConfig.sol";

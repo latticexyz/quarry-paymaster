@@ -9,14 +9,9 @@ pragma solidity >=0.8.24;
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IPassSystem {
-  error PassSystem_Unauthorized(bytes32 passId, address caller, address grantor);
-  error PassSystem_PassExpired(bytes32 passId, uint256 validityPeriod, address user, uint256 lastRenewed);
-  error PassSystem_PendingCooldown(bytes32 passId, uint256 claimInterval, address user, uint256 lastClaimed);
-  error PassSystem_InsufficientGrantorAllowance(bytes32 passId, address grantor, uint256 allowance, uint256 required);
+  function registerPass(bytes32, uint256, uint256, uint256) external pure;
 
-  function registerPass(bytes32 passId, uint256 claimAmount, uint256 claimInterval, uint256 validityPeriod) external;
+  function issuePass(bytes32, address) external pure;
 
-  function issuePass(bytes32 passId, address user) external;
-
-  function claimFor(address user, bytes32 passId) external;
+  function claimFor(address, bytes32) external pure;
 }
