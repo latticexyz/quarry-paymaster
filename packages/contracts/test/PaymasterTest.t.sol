@@ -30,8 +30,7 @@ contract PaymasterTest is MudTest {
   address grantor;
   SimpleAccount account;
 
-  uint256 grantAllowance = 10 ether;
-  uint256 paymasterDeposit = 10 ether;
+  uint256 sponsorBalance = 10 ether;
 
   function setUp() public override {
     super.setUp();
@@ -46,10 +45,9 @@ contract PaymasterTest is MudTest {
     grantor = payable(makeAddr("grantor"));
     account = accountFactory.createAccount(user, 0);
 
-    entryPoint.depositTo{ value: paymasterDeposit }(address(paymaster));
-
-    vm.prank(admin);
-    paymaster.setGrantAllowance(grantor, grantAllowance);
+    vm.deal(grantor, sponsorBalance);
+    vm.prank(grantor);
+    paymaster.depositTo{ value: sponsorBalance }(grantor);
 
     vm.prank(admin);
     SystemConfig.setEntryPoint(address(entryPoint));
@@ -120,14 +118,14 @@ contract PaymasterTest is MudTest {
     uint256 requiredAllowance = 380000000000000;
     vm.prank(grantor);
     paymaster.grantAllowance(address(account), requiredAllowance);
-    assertEq(Grantor.getAllowance(grantor), grantAllowance - requiredAllowance);
-    assertEq(Allowance.get(address(account)), requiredAllowance);
+    assertEq(Balance.getBalance(grantor), sponsorBalance - requiredAllowance);
+    assertEq(Allowance.getAllowance(address(account)), requiredAllowance);
 
     // Expect the user op to succeed now and the balance to be taken from the user account
     assertEq(beneficiary.balance, 0);
     submitUserOp(op);
-    uint256 feePaidByPaymaster = paymasterDeposit - entryPoint.balanceOf(address(paymaster));
-    uint256 feePaidByUser = requiredAllowance - Allowance.get(address(account));
+    uint256 feePaidByPaymaster = sponsorBalance - entryPoint.balanceOf(address(paymaster));
+    uint256 feePaidByUser = requiredAllowance - Allowance.getAllowance(address(account));
     assertGt(beneficiary.balance, 0);
     assertEq(beneficiary.balance, feePaidByPaymaster);
     assertGt(feePaidByUser, 0);
@@ -151,23 +149,23 @@ contract PaymasterTest is MudTest {
     uint256 partialAllowance = 10_000; // About half of the required amount
     vm.prank(grantor);
     paymaster.grantAllowance(address(account), partialAllowance);
-    assertEq(Grantor.getAllowance(grantor), grantAllowance - partialAllowance);
-    assertEq(Allowance.get(address(account)), partialAllowance);
+    assertEq(Balance.getBalance(grantor), sponsorBalance - partialAllowance);
+    assertEq(Allowance.getAllowance(address(account)), partialAllowance);
 
     // Deposit a balance that's more than enough to cover the entire cost
     uint256 balanceDeposit = 0.1 ether; // More than enough to cover the full cost
     vm.deal(address(account), balanceDeposit);
     vm.prank(address(account));
     paymaster.depositTo{ value: balanceDeposit }(address(account));
-    assertEq(Balance.get(address(account)), balanceDeposit);
+    assertEq(Balance.getBalance(address(account)), balanceDeposit);
 
     // Expect the user op to succeed with partial payment from both allowance and balance
     uint256 paymasterBalance = entryPoint.balanceOf(address(paymaster));
     assertEq(beneficiary.balance, 0);
     submitUserOp(op);
     uint256 feePaidByPaymaster = paymasterBalance - entryPoint.balanceOf(address(paymaster));
-    uint256 remainingAllowance = Allowance.get(address(account));
-    uint256 remainingBalance = Balance.get(address(account));
+    uint256 remainingAllowance = Allowance.getAllowance(address(account));
+    uint256 remainingBalance = Balance.getBalance(address(account));
 
     // Verify that allowance was fully depleted before balance was used
     assertEq(remainingAllowance, 0, "Allowance should be fully depleted");
@@ -203,18 +201,18 @@ contract PaymasterTest is MudTest {
     vm.deal(user, balanceDeposit);
     vm.prank(user);
     paymaster.depositTo{ value: balanceDeposit }(user);
-    assertEq(Balance.get(user), balanceDeposit);
+    assertEq(Balance.getBalance(user), balanceDeposit);
 
     // Expect the user op to succeed using only the user's balance
     uint256 paymasterBalance = entryPoint.balanceOf(address(paymaster));
     assertEq(beneficiary.balance, 0);
     submitUserOp(op);
     uint256 feePaidByPaymaster = paymasterBalance - entryPoint.balanceOf(address(paymaster));
-    uint256 remainingBalance = Balance.get(user);
+    uint256 remainingBalance = Balance.getBalance(user);
 
     // Verify that balance was used and allowance wasn't touched
     assertLt(remainingBalance, balanceDeposit, "Balance should be reduced");
-    assertEq(Allowance.get(user), 0, "Allowance should remain at 0");
+    assertEq(Allowance.getAllowance(user), 0, "Allowance should remain at 0");
     assertGt(beneficiary.balance, 0);
     assertEq(beneficiary.balance, feePaidByPaymaster);
 
@@ -241,8 +239,8 @@ contract PaymasterTest is MudTest {
     uint256 requiredAllowance = 380000000000000;
     vm.prank(grantor);
     paymaster.grantAllowance(user, requiredAllowance);
-    assertEq(Grantor.getAllowance(grantor), grantAllowance - requiredAllowance);
-    assertEq(Allowance.get(user), requiredAllowance);
+    assertEq(Balance.getBalance(grantor), sponsorBalance - requiredAllowance);
+    assertEq(Allowance.getAllowance(user), requiredAllowance);
 
     // Expect the call to fail while the account is not a spender of the user
     expectUserOpRevert(
@@ -255,7 +253,7 @@ contract PaymasterTest is MudTest {
       )
     );
     submitUserOp(op);
-    assertEq(Allowance.get(address(user)), requiredAllowance);
+    assertEq(Allowance.getAllowance(address(user)), requiredAllowance);
 
     // Register the account as spender for the user
     vm.prank(user);
@@ -264,8 +262,8 @@ contract PaymasterTest is MudTest {
     // Expect the user op to succeed now and the balance to be taken from the user account
     assertEq(beneficiary.balance, 0);
     submitUserOp(op);
-    uint256 feePaidByPaymaster = paymasterDeposit - entryPoint.balanceOf(address(paymaster));
-    uint256 feePaidByUser = requiredAllowance - Allowance.get(address(user));
+    uint256 feePaidByPaymaster = sponsorBalance - entryPoint.balanceOf(address(paymaster));
+    uint256 feePaidByUser = requiredAllowance - Allowance.getAllowance(address(user));
     assertGt(beneficiary.balance, 0);
     assertEq(beneficiary.balance, feePaidByPaymaster);
     assertGt(feePaidByUser, 0);

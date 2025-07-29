@@ -16,6 +16,7 @@ const config = defineWorld({
         // Allowance gets granted and is not withdrawable
         // Allowance is organized as a linked list and gets spent from smallest to largest
         Allowance: {
+          name: "AllowanceV2",
           schema: {
             user: "address",
             sponsor: "address",

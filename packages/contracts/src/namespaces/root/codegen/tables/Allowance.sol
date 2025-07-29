@@ -22,8 +22,8 @@ struct AllowanceData {
 }
 
 library Allowance {
-  // Hex below is the result of `WorldResourceIdLib.encode({ namespace: "", name: "Allowance", typeId: RESOURCE_TABLE });`
-  ResourceId constant _tableId = ResourceId.wrap(0x74620000000000000000000000000000416c6c6f77616e636500000000000000);
+  // Hex below is the result of `WorldResourceIdLib.encode({ namespace: "", name: "AllowanceV2", typeId: RESOURCE_TABLE });`
+  ResourceId constant _tableId = ResourceId.wrap(0x74620000000000000000000000000000416c6c6f77616e636556320000000000);
 
   FieldLayout constant _fieldLayout =
     FieldLayout.wrap(0x0034020020140000000000000000000000000000000000000000000000000000);
