@@ -9,7 +9,6 @@ import { IBalanceSystem } from "./IBalanceSystem.sol";
 import { IPaymasterSystem } from "./IPaymasterSystem.sol";
 import { ISpenderSystem } from "./ISpenderSystem.sol";
 import { IAdminSystem } from "./IAdminSystem.sol";
-import { IGrantSystem } from "./IGrantSystem.sol";
 import { IPassSystem } from "./IPassSystem.sol";
 
 /**
@@ -26,6 +25,5 @@ interface IWorld is
   IPaymasterSystem,
   ISpenderSystem,
   IAdminSystem,
-  IGrantSystem,
   IPassSystem
 {}

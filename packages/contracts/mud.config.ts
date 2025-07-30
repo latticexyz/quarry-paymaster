@@ -33,6 +33,13 @@ const config = defineWorld({
           },
           key: ["user"],
         },
+        BlockedAllowance: {
+          schema: {
+            user: "address",
+            blocked: "uint256",
+          },
+          key: ["user"],
+        },
         Spender: {
           schema: {
             spender: "address",
