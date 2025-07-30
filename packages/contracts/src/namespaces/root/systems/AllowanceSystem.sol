@@ -28,11 +28,6 @@ contract AllowanceSystem is System {
       revert AllowanceSystem_AllowanceBelowMinimum(allowance, MIN_ALLOWANCE);
     }
 
-    AllowanceListData memory allowanceList = AllowanceList.get(user);
-    if (allowanceList.length >= MAX_NUM_ALLOWANCES) {
-      revert AllowanceSystem_AllowancesLimitReached(allowanceList.length, MAX_NUM_ALLOWANCES);
-    }
-
     // Take allowance from sponsor's balance
     uint256 balance = Balance.get(sponsor);
     if (balance < allowance) {
@@ -43,6 +38,11 @@ contract AllowanceSystem is System {
     uint256 newAllowance = Allowance.getAllowance({ user: user, sponsor: sponsor }) + allowance;
 
     AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: true });
+
+    AllowanceListData memory allowanceList = AllowanceList.get(user);
+    if (allowanceList.length >= MAX_NUM_ALLOWANCES) {
+      revert AllowanceSystem_AllowancesLimitReached(allowanceList.length, MAX_NUM_ALLOWANCES);
+    }
 
     // Find the last sponsor with an allowance less than the new allowance and
     // the first sponsor with an allowance greater than or equal to the new allowance
@@ -139,7 +139,7 @@ library AllowanceLib {
     }
 
     AllowanceData memory removedItem = Allowance.get({ user: user, sponsor: sponsor });
-    if (removedItem.allowance == 0) {
+    if (removedItem.allowance == 0 && removedItem.next == address(0)) {
       return;
     }
 
