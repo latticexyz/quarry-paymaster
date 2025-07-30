@@ -278,7 +278,7 @@ contract PaymasterTest is MudTest {
       userKey,
       address(counter),
       0,
-      abi.encodeWithSelector(TestCounter.count.selector)
+      abi.encodeWithSelector(TestCounter.gasWaster.selector, 10000, "junk")
     );
 
     op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(100000), uint128(100000));
@@ -293,12 +293,12 @@ contract PaymasterTest is MudTest {
     // Create additional grantors
     address grantor2 = makeAddr("grantor2");
     address grantor3 = makeAddr("grantor3");
-    
+
     // Fund grantors
     vm.deal(grantor2, sponsorBalance);
     vm.prank(grantor2);
     paymaster.depositTo{ value: sponsorBalance }(grantor2);
-    
+
     vm.deal(grantor3, sponsorBalance);
     vm.prank(grantor3);
     paymaster.depositTo{ value: sponsorBalance }(grantor3);
@@ -306,34 +306,36 @@ contract PaymasterTest is MudTest {
     // Grant allowances in order (they will be sorted by amount)
     vm.prank(grantor);
     paymaster.grantAllowance(address(account), firstAllowance);
-    
+
     vm.prank(grantor2);
     paymaster.grantAllowance(address(account), secondAllowance);
-    
+
     vm.prank(grantor3);
     paymaster.grantAllowance(address(account), thirdAllowance);
 
     // Verify total available allowance
     uint256 totalAllowance = firstAllowance + secondAllowance + thirdAllowance;
-    assertEq(AllowanceLib.getAvailableAllowance(address(account)), totalAllowance);
+    assertEq(AllowanceLib.getAvailableAllowance(address(account)), totalAllowance, "total allowance");
 
     // Execute the operation
-    assertEq(beneficiary.balance, 0);
+    assertEq(beneficiary.balance, 0, "beneficiary balance before");
     submitUserOp(op);
-    
+
     // Verify the first allowance was fully consumed and removed
-    assertEq(Allowance.getAllowance(address(account), grantor), 0);
-    
+    assertEq(Allowance.getAllowance(address(account), grantor), 0, "first allowance");
+
     // Verify the second allowance was partially consumed
     uint256 remainingFromFirst = requiredAllowance - firstAllowance;
     uint256 expectedSecondRemaining = secondAllowance + thirdAllowance - remainingFromFirst;
-    
+    assertEq(Allowance.getAllowance(address(account), grantor3), 0, "third allowance");
+
     // Since allowances are consumed from lowest to highest, check remaining allowances
     uint256 remainingAllowance = AllowanceLib.getAvailableAllowance(address(account));
-    assertEq(remainingAllowance, totalAllowance - requiredAllowance);
-    
+    assertEq(Allowance.getAllowance(address(account), grantor2), remainingAllowance, "second allowance");
+    assertEq(remainingAllowance, totalAllowance - requiredAllowance, "remaining allowance");
+
     // Verify beneficiary received payment
-    assertGt(beneficiary.balance, 0);
+    assertGt(beneficiary.balance, 0, "beneficiary balance after");
   }
 
   function fillUserOp(

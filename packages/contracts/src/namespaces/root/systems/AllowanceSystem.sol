@@ -49,7 +49,7 @@ contract AllowanceSystem is System {
     address previousSponsor;
     address nextSponsor = allowanceList.first;
     AllowanceData memory nextItem = Allowance.get({ user: user, sponsor: nextSponsor });
-    while (nextItem.next != address(0) && nextItem.allowance < newAllowance) {
+    while (nextSponsor != address(0) && nextItem.allowance < newAllowance) {
       previousSponsor = nextSponsor;
       nextSponsor = nextItem.next;
       nextItem = Allowance.get({ user: user, sponsor: nextSponsor });
