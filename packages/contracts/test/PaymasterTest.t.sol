@@ -148,8 +148,14 @@ contract PaymasterTest is MudTest {
 
     // Grant partial allowance that's not enough to cover the full cost
     uint256 partialAllowance = 10_000; // About half of the required amount
-    vm.prank(grantor);
-    paymaster.grantAllowance(address(account), partialAllowance);
+
+    // Use library to grant allowance below the minimum
+    vm.startPrank(admin);
+    AllowanceLib.grantAllowance(address(account), grantor, partialAllowance);
+    vm.stopPrank();
+
+    // vm.prank(grantor);
+    // paymaster.grantAllowance(address(account), partialAllowance);
     assertEq(Balance.getBalance(grantor), sponsorBalance - partialAllowance);
     assertEq(AllowanceLib.getAvailableAllowance(address(account)), partialAllowance);
 
@@ -301,9 +307,10 @@ contract PaymasterTest is MudTest {
     uint256 firstAllowance = 10_000;
     uint256 secondAllowance = requiredAllowance;
 
-    // Grant allowances in order (they will be sorted by amount)
-    vm.prank(sponsor1);
-    paymaster.grantAllowance(address(account), firstAllowance);
+    // Use library to grant allowance below the minimum
+    vm.startPrank(admin);
+    AllowanceLib.grantAllowance(address(account), sponsor1, firstAllowance);
+    vm.stopPrank();
 
     vm.prank(sponsor2);
     paymaster.grantAllowance(address(account), secondAllowance);

@@ -10,8 +10,8 @@ import { BlockedAllowance } from "../codegen/tables/BlockedAllowance.sol";
 import { SystemConfig } from "../codegen/tables/SystemConfig.sol";
 import { IEntryPoint } from "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
-uint256 constant MIN_ALLOWANCE = 10_000;
-uint256 constant MAX_NUM_ALLOWANCES = 10;
+uint256 constant MIN_ALLOWANCE = 0.00001 ether;
+uint256 constant MAX_NUM_ALLOWANCES = 20;
 
 // TODO: optimize to avoid updating the list multiple times per call
 
@@ -22,53 +22,11 @@ contract AllowanceSystem is System {
   error AllowanceSystem_NotAuthorized(address caller, address sponsor, address user);
 
   function grantAllowance(address user, uint256 allowance) public payable {
-    address sponsor = _msgSender();
-
     if (allowance < MIN_ALLOWANCE) {
       revert AllowanceSystem_AllowanceBelowMinimum(allowance, MIN_ALLOWANCE);
     }
-
-    // Take allowance from sponsor's balance
-    uint256 balance = Balance.get(sponsor);
-    if (balance < allowance) {
-      revert AllowanceSystem_InsufficientBalance(balance, allowance);
-    }
-    Balance.set({ user: sponsor, balance: balance - allowance });
-
-    uint256 newAllowance = Allowance.getAllowance({ user: user, sponsor: sponsor }) + allowance;
-
-    AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: true });
-
-    AllowanceListData memory allowanceList = AllowanceList.get(user);
-    if (allowanceList.length >= MAX_NUM_ALLOWANCES) {
-      revert AllowanceSystem_AllowancesLimitReached(allowanceList.length, MAX_NUM_ALLOWANCES);
-    }
-
-    // Find the last sponsor with an allowance less than the new allowance and
-    // the first sponsor with an allowance greater than or equal to the new allowance
-    address previousSponsor;
-    address nextSponsor = allowanceList.first;
-    AllowanceData memory nextItem = Allowance.get({ user: user, sponsor: nextSponsor });
-    while (nextSponsor != address(0) && nextItem.allowance < newAllowance) {
-      previousSponsor = nextSponsor;
-      nextSponsor = nextItem.next;
-      nextItem = Allowance.get({ user: user, sponsor: nextSponsor });
-    }
-
-    Allowance.set({ user: user, sponsor: sponsor, allowance: newAllowance, next: nextSponsor });
-    AllowanceList.setLength({ user: user, length: AllowanceList.getLength(user) + 1 });
-
-    // Link the previous sponsor to the new sponsor
-    if (previousSponsor == address(0)) {
-      AllowanceList.setFirst({ user: user, first: sponsor });
-    } else {
-      Allowance.setNext({ user: user, sponsor: previousSponsor, next: sponsor });
-    }
-
-    // Link the new sponsor to the next sponsor
-    if (nextSponsor != address(0)) {
-      Allowance.setNext({ user: user, sponsor: sponsor, next: nextSponsor });
-    }
+    address sponsor = _msgSender();
+    AllowanceLib.grantAllowance(user, sponsor, allowance);
   }
 
   function removeAllowance(address user, address sponsor) public {
@@ -104,6 +62,50 @@ library AllowanceLib {
       sponsor = allowanceItem.next;
     }
     return available - BlockedAllowance.get(user);
+  }
+
+  function grantAllowance(address user, address sponsor, uint256 allowance) internal {
+    // Take allowance from sponsor's balance
+    uint256 balance = Balance.get(sponsor);
+    if (balance < allowance) {
+      revert AllowanceSystem.AllowanceSystem_InsufficientBalance(balance, allowance);
+    }
+    Balance.set({ user: sponsor, balance: balance - allowance });
+
+    uint256 newAllowance = Allowance.getAllowance({ user: user, sponsor: sponsor }) + allowance;
+
+    AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: true });
+
+    AllowanceListData memory allowanceList = AllowanceList.get(user);
+    if (allowanceList.length >= MAX_NUM_ALLOWANCES) {
+      revert AllowanceSystem.AllowanceSystem_AllowancesLimitReached(allowanceList.length, MAX_NUM_ALLOWANCES);
+    }
+
+    // Find the last sponsor with an allowance less than the new allowance and
+    // the first sponsor with an allowance greater than or equal to the new allowance
+    address previousSponsor;
+    address nextSponsor = allowanceList.first;
+    AllowanceData memory nextItem = Allowance.get({ user: user, sponsor: nextSponsor });
+    while (nextSponsor != address(0) && nextItem.allowance < newAllowance) {
+      previousSponsor = nextSponsor;
+      nextSponsor = nextItem.next;
+      nextItem = Allowance.get({ user: user, sponsor: nextSponsor });
+    }
+
+    Allowance.set({ user: user, sponsor: sponsor, allowance: newAllowance, next: nextSponsor });
+    AllowanceList.setLength({ user: user, length: AllowanceList.getLength(user) + 1 });
+
+    // Link the previous sponsor to the new sponsor
+    if (previousSponsor == address(0)) {
+      AllowanceList.setFirst({ user: user, first: sponsor });
+    } else {
+      Allowance.setNext({ user: user, sponsor: previousSponsor, next: sponsor });
+    }
+
+    // Link the new sponsor to the next sponsor
+    if (nextSponsor != address(0)) {
+      Allowance.setNext({ user: user, sponsor: sponsor, next: nextSponsor });
+    }
   }
 
   function blockAllowance(address user, uint256 amount) internal {
