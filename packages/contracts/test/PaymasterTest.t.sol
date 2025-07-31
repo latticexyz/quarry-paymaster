@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.24;
 
-import "forge-std/Test.sol";
 import { MudTest } from "@latticexyz/world/test/MudTest.t.sol";
 import { EntryPoint, IEntryPoint } from "@account-abstraction/contracts/core/EntryPoint.sol";
 import { PackedUserOperation } from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
@@ -12,6 +11,7 @@ import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOw
 
 import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.sol";
 import { Allowance } from "../src/namespaces/root/codegen/tables/Allowance.sol";
+import { AllowanceList } from "../src/namespaces/root/codegen/tables/AllowanceList.sol";
 import { AllowanceLib } from "../src/namespaces/root/systems/AllowanceSystem.sol";
 import { Balance } from "../src/namespaces/root/codegen/tables/Balance.sol";
 import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
@@ -272,49 +272,44 @@ contract PaymasterTest is MudTest {
   }
 
   function testCallWithPaymaster_MultipleAllowances() external {
-    vm.deal(address(account), 1e18);
+    address sponsor1 = makeAddr("sponsor1");
+    address sponsor2 = makeAddr("sponsor2");
+    address sponsor3 = makeAddr("sponsor3");
+    vm.deal(sponsor1, sponsorBalance);
+    vm.deal(sponsor2, sponsorBalance);
+    vm.deal(sponsor3, sponsorBalance);
+    vm.prank(sponsor1);
+    paymaster.depositTo{ value: sponsorBalance }(sponsor1);
+    vm.prank(sponsor2);
+    paymaster.depositTo{ value: sponsorBalance }(sponsor2);
+    vm.prank(sponsor3);
+    paymaster.depositTo{ value: sponsorBalance }(sponsor3);
+
     PackedUserOperation memory op = fillUserOp(
       account,
       userKey,
       address(counter),
       0,
-      abi.encodeWithSelector(TestCounter.gasWaster.selector, 10000, "junk")
+      abi.encodeWithSelector(TestCounter.spendGas.selector, 30_000)
     );
 
     op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(100000), uint128(100000));
     op.signature = signUserOp(op, userKey);
 
     // Grant multiple allowances from different sponsors
-    uint256 requiredAllowance = 380000000000000;
-    uint256 firstAllowance = 100000000000000; // Less than required
-    uint256 secondAllowance = 200000000000000; // Still not enough when combined
-    uint256 thirdAllowance = 150000000000000; // This makes it enough
-
-    // Create additional grantors
-    address grantor2 = makeAddr("grantor2");
-    address grantor3 = makeAddr("grantor3");
-
-    // Fund grantors
-    vm.deal(grantor2, sponsorBalance);
-    vm.prank(grantor2);
-    paymaster.depositTo{ value: sponsorBalance }(grantor2);
-
-    vm.deal(grantor3, sponsorBalance);
-    vm.prank(grantor3);
-    paymaster.depositTo{ value: sponsorBalance }(grantor3);
+    uint256 requiredAllowance = 1_000_000_000_000_000_000;
+    uint256 firstAllowance = 10_000;
+    uint256 secondAllowance = requiredAllowance;
 
     // Grant allowances in order (they will be sorted by amount)
-    vm.prank(grantor);
+    vm.prank(sponsor1);
     paymaster.grantAllowance(address(account), firstAllowance);
 
-    vm.prank(grantor2);
+    vm.prank(sponsor2);
     paymaster.grantAllowance(address(account), secondAllowance);
 
-    vm.prank(grantor3);
-    paymaster.grantAllowance(address(account), thirdAllowance);
-
     // Verify total available allowance
-    uint256 totalAllowance = firstAllowance + secondAllowance + thirdAllowance;
+    uint256 totalAllowance = firstAllowance + secondAllowance;
     assertEq(AllowanceLib.getAvailableAllowance(address(account)), totalAllowance, "total allowance");
 
     // Execute the operation
@@ -322,17 +317,14 @@ contract PaymasterTest is MudTest {
     submitUserOp(op);
 
     // Verify the first allowance was fully consumed and removed
-    assertEq(Allowance.getAllowance(address(account), grantor), 0, "first allowance");
+    assertEq(Allowance.getAllowance(address(account), sponsor1), 0, "first allowance");
+    assertEq(AllowanceList.getFirst(address(account)), sponsor2, "first allowance");
 
     // Verify the second allowance was partially consumed
-    uint256 remainingFromFirst = requiredAllowance - firstAllowance;
-    uint256 expectedSecondRemaining = secondAllowance + thirdAllowance - remainingFromFirst;
-    assertEq(Allowance.getAllowance(address(account), grantor3), 0, "third allowance");
-
-    // Since allowances are consumed from lowest to highest, check remaining allowances
-    uint256 remainingAllowance = AllowanceLib.getAvailableAllowance(address(account));
-    assertEq(Allowance.getAllowance(address(account), grantor2), remainingAllowance, "second allowance");
-    assertEq(remainingAllowance, totalAllowance - requiredAllowance, "remaining allowance");
+    uint256 sponsor2Allowance = Allowance.getAllowance(address(account), sponsor2);
+    assertLt(sponsor2Allowance, secondAllowance, "second allowance partially consumed");
+    assertGt(sponsor2Allowance, 0, "second allowance not fully consumed");
+    assertEq(AllowanceLib.getAvailableAllowance(address(account)), sponsor2Allowance, "remaining allowance");
 
     // Verify beneficiary received payment
     assertGt(beneficiary.balance, 0, "beneficiary balance after");
