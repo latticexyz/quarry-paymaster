@@ -5,7 +5,6 @@ import {
   Client,
   EIP1193RequestFn,
   Hash,
-  HttpTransport,
   RpcUserOperationReceipt,
   Transport,
   createTransport,

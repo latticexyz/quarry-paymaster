@@ -6,6 +6,7 @@ import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { chain } from "./chain";
 import { paymaster } from "./contract";
 import env from "./env";
+import { getBundlerTransport } from "./getBundlerTransport";
 
 const clientOptions = {
   chain,
@@ -15,8 +16,7 @@ const clientOptions = {
 
 export const publicClient = createPublicClient(clientOptions);
 
-// export const bundlerTransport = wiresaw(http(chain.rpcUrls.bundler.http[0]));
-export const bundlerTransport = http(chain.rpcUrls.bundler.http[0]);
+export const bundlerTransport = getBundlerTransport(chain);
 export const bundlerClient = createBundlerClient({
   ...clientOptions,
   transport: bundlerTransport,

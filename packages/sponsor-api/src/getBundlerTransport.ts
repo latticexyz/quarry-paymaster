@@ -1,10 +1,11 @@
 import { transactionQueue } from "@latticexyz/common/actions";
-import { Chain, createClient, fallback, http, keccak256, stringToHex, webSocket } from "viem";
+import { Chain, createClient, fallback, http, keccak256, stringToHex, Transport, webSocket } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { userOpExecutor } from "./local/userOpExecutor";
 import { wiresaw } from "@latticexyz/common/internal";
+import { debug } from "./debug";
 
-export function getBundlerTransport(chain: Chain) {
+export function getBundlerTransport(chain: Chain): Transport {
   if ("wiresaw" in chain.rpcUrls) {
     return wiresaw();
   }
@@ -16,6 +17,7 @@ export function getBundlerTransport(chain: Chain) {
   }
 
   if (chain.id === 31337) {
+    debug("Using local user op executor");
     return userOpExecutor({
       executor: createClient({
         chain,
