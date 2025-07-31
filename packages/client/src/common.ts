@@ -1,11 +1,16 @@
 import { chains } from "./wagmiConfig";
 import { Chain } from "viem";
+import mudConfig from "contracts/mud.config";
 
 export const chainId = import.meta.env.CHAIN_ID;
 export const worldAddress = import.meta.env.WORLD_ADDRESS;
 export const startBlock = BigInt(import.meta.env.START_BLOCK ?? 0n);
 
 export const url = new URL(window.location.href);
+export const tables = {
+  Balance: mudConfig.namespaces.root.tables.Balance,
+  Allowance: mudConfig.namespaces.root.tables.Allowance,
+};
 
 export function getWorldAddress() {
   if (!worldAddress) {
