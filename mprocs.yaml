@@ -1,6 +1,6 @@
 procs:
-  client:
-    cwd: packages/client
+  dashboard:
+    cwd: packages/dashboard
     shell: pnpm vite
   contracts:
     cwd: packages/contracts
