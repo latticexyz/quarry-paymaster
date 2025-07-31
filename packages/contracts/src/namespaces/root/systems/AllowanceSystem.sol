@@ -65,7 +65,6 @@ library AllowanceLib {
   }
 
   function grantAllowance(address user, address sponsor, uint256 allowance) internal {
-    // Take allowance from sponsor's balance
     uint256 balance = Balance.get(sponsor);
     if (balance < allowance) {
       revert AllowanceSystem.AllowanceSystem_InsufficientBalance(balance, allowance);

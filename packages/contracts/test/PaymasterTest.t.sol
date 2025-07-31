@@ -13,6 +13,7 @@ import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.
 import { Allowance } from "../src/namespaces/root/codegen/tables/Allowance.sol";
 import { AllowanceList } from "../src/namespaces/root/codegen/tables/AllowanceList.sol";
 import { AllowanceLib } from "../src/namespaces/root/systems/AllowanceSystem.sol";
+import { BlockedAllowance } from "../src/namespaces/root/codegen/tables/BlockedAllowance.sol";
 import { Balance } from "../src/namespaces/root/codegen/tables/Balance.sol";
 import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
 import { TestCounter } from "./utils/TestCounter.sol";
@@ -317,24 +318,27 @@ contract PaymasterTest is MudTest {
 
     // Verify total available allowance
     uint256 totalAllowance = firstAllowance + secondAllowance;
-    assertEq(AllowanceLib.getAvailableAllowance(address(account)), totalAllowance, "total allowance");
+    assertEq(AllowanceLib.getAvailableAllowance(address(account)), totalAllowance);
 
     // Execute the operation
-    assertEq(beneficiary.balance, 0, "beneficiary balance before");
+    assertEq(beneficiary.balance, 0);
     submitUserOp(op);
 
     // Verify the first allowance was fully consumed and removed
-    assertEq(Allowance.getAllowance(address(account), sponsor1), 0, "first allowance");
-    assertEq(AllowanceList.getFirst(address(account)), sponsor2, "first allowance");
+    assertEq(Allowance.getAllowance(address(account), sponsor1), 0);
+    assertEq(AllowanceList.getFirst(address(account)), sponsor2);
 
     // Verify the second allowance was partially consumed
     uint256 sponsor2Allowance = Allowance.getAllowance(address(account), sponsor2);
-    assertLt(sponsor2Allowance, secondAllowance, "second allowance partially consumed");
-    assertGt(sponsor2Allowance, 0, "second allowance not fully consumed");
-    assertEq(AllowanceLib.getAvailableAllowance(address(account)), sponsor2Allowance, "remaining allowance");
+    assertLt(sponsor2Allowance, secondAllowance);
+    assertGt(sponsor2Allowance, 0);
+    assertEq(AllowanceLib.getAvailableAllowance(address(account)), sponsor2Allowance);
+
+    // Verify there is no blocked allowance after the operation
+    assertEq(BlockedAllowance.get(address(account)), 0);
 
     // Verify beneficiary received payment
-    assertGt(beneficiary.balance, 0, "beneficiary balance after");
+    assertGt(beneficiary.balance, 0);
   }
 
   function fillUserOp(
