@@ -1,27 +1,28 @@
 import { type } from "arktype";
 import { HexType } from "../common";
 import { params } from "./common";
-import { decodeErrorResult, formatAbiItemWithArgs, getAction, isHex, padHex, toHex } from "viem/utils";
+import { decodeErrorResult, formatAbiItemWithArgs, getAction, isHex } from "viem/utils";
 import { bundlerClient, getSmartAccountClient } from "../clients";
 import { sendUserOperation, UserOperationReceipt, waitForUserOperationReceipt } from "viem/account-abstraction";
 import { paymaster } from "../contract";
 import { debug } from "../debug";
+import env from "../env";
 
 /**
- * [passId: Hex, receiver: Hex]
+ * [receiver: Hex]
  */
-const IssuePassInput = type([HexType, HexType]);
+const RequestAllowanceInput = type([HexType]);
 
-export async function issuePass(rawInput: typeof params.infer) {
-  const input = IssuePassInput(rawInput);
+export async function requestAllowance(rawInput: typeof params.infer) {
+  const input = RequestAllowanceInput(rawInput);
   if (input instanceof type.errors) {
     throw new Error(input.summary);
   }
 
   const smartAccountClient = await getSmartAccountClient();
 
-  const [passId, receiver] = input;
-  debug(`sending user operation to issue pass ${passId} to ${receiver}`);
+  const [receiver] = input;
+  debug(`sending user operation to grant allowance to ${receiver}`);
   const hash = await getAction(
     smartAccountClient,
     sendUserOperation,
@@ -31,8 +32,8 @@ export async function issuePass(rawInput: typeof params.infer) {
       {
         abi: paymaster.abi,
         to: paymaster.address,
-        functionName: "issuePass",
-        args: [padHex(passId), receiver],
+        functionName: "grantAllowance",
+        args: [receiver, BigInt(env.ALLOWANCE_AMOUNT)],
       },
     ],
     maxFeePerGas: 100_000n,
@@ -53,24 +54,31 @@ export async function issuePass(rawInput: typeof params.infer) {
     throw new Error(errorMessage);
   }
 
-  debug(`successfully issued pass ${passId} to ${receiver}`);
-  return { message: `Successfully issued pass ${passId} to ${receiver}.`, hash };
+  debug(`successfully granted allowance to ${receiver}`);
+  return { message: `Successfully granted allowance to ${receiver}.`, hash };
 }
 
 function formatRevertReason(receipt: UserOperationReceipt): string {
   if (!isHex(receipt.reason)) {
-    return `Failed to issue pass for an unknown reason.\n\nTransaction hash: ${receipt.receipt.transactionHash}`;
+    return `Failed to grant allowance for an unknown reason.\n\nTransaction hash: ${receipt.receipt.transactionHash}`;
   }
 
   const reason = decodeErrorResult({ abi: paymaster.abi, data: receipt.reason });
 
   let output = formatAbiItemWithArgs(reason) + "\n\n";
 
-  if (reason.errorName === "PassSystem_Unauthorized") {
-    output +=
-      reason.args[2] === toHex("", { size: 20 })
-        ? `Pass ${reason.args[0]} does not exist.`
-        : `Caller ${reason.args[1]} is not authorized to issue pass ${reason.args[0]}.`;
+  if (reason.errorName === "AllowanceSystem_AllowanceBelowMinimum") {
+    output += `Allowance below minimum.`;
+    output += "\n\n";
+  }
+
+  if (reason.errorName === "AllowanceSystem_InsufficientBalance") {
+    output += `Sponsor balance is not sufficient to grant allowance.`;
+    output += "\n\n";
+  }
+
+  if (reason.errorName === "AllowanceSystem_AllowancesLimitReached") {
+    output += `User has reached the maximum number of allowances. Remove one and try again.`;
     output += "\n\n";
   }
 

@@ -7,20 +7,10 @@ procs:
     shell: pnpm mud dev-contracts --rpc http://127.0.0.1:8545
   anvil:
     cwd: packages/contracts
-    shell: anvil
+    shell: anvil --block-time 2 --load-state anvil-state.json
   explorer:
     cwd: packages/contracts
     shell: pnpm explorer
-  bundler:
-    cwd: ../alto
-    shell: pnpm ts-node scripts/localDeployer/index.ts &&
-      cd ../quarry-paymaster/packages/contracts &&
-      pnpm fund:paymaster:local &&
-      echo 'sleep 6' &&
-      sleep 6 &&
-      pnpm fund:issuer:local &&
-      cd ../../../alto &&
-      ./alto --config ../quarry-paymaster/alto.config.json
-  issuer:
-    cwd: packages/issuer
+  sponsor-api:
+    cwd: packages/sponsor-api
     shell: echo 'sleep 4' && sleep 4 && pnpm start
