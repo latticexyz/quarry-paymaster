@@ -25,6 +25,12 @@ contract FundSponsor is Script {
       uint256 amount = targetBalance - balance;
       console.log("Funding sponsor with %s", amount);
       uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+
+      console.log("Sponsor address: %s", sponsorAddress);
+      console.log("Paymaster address: %s", address(paymaster));
+      console.log("Entrypoint address: %s", SystemConfig.getEntryPoint());
+      console.log("Deployer private key: %s", deployerPrivateKey);
+
       vm.startBroadcast(deployerPrivateKey);
       paymaster.depositTo{ value: amount }(sponsorAddress);
       vm.stopBroadcast();
