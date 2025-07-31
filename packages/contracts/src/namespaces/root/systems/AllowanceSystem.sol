@@ -36,6 +36,10 @@ contract AllowanceSystem is System {
     }
     AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: true });
   }
+
+  function getAllowance(address user) public view returns (uint256) {
+    return AllowanceLib.getAvailableAllowance(user);
+  }
 }
 
 library AllowanceLib {

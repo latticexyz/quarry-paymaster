@@ -17,4 +17,6 @@ interface IAllowanceSystem {
   function grantAllowance(address user, uint256 allowance) external payable;
 
   function removeAllowance(address user, address sponsor) external;
+
+  function getAllowance(address user) external view returns (uint256);
 }
