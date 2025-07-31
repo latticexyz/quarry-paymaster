@@ -22,12 +22,14 @@
     "@latticexyz/world": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@tanstack/react-query": "^5.63.0",
     "contracts": "workspace:*",
+    "sponsor-api": "workspace:*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-error-boundary": "5.0.0",
     "tailwind-merge": "^2.6.0",
     "viem": "2.30.6",
-    "wagmi": "2.15.5"
+    "wagmi": "2.15.5",
+    "debug": "^4.3.7"
   },
   "devDependencies": {
     "@types/react": "18.2.22",

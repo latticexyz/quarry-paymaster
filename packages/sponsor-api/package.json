@@ -10,6 +10,9 @@
     "test": "tsc --noEmit"
   },
   "author": "",
+  "exports": {
+    "./internal": "./src/exports/internal.ts"
+  },
   "devDependencies": {
     "@koa/bodyparser": "^5.1.1",
     "@koa/cors": "^5.0.0",
