@@ -11,7 +11,8 @@ pragma solidity >=0.8.24;
 interface IAllowanceSystem {
   error AllowanceSystem_AllowanceBelowMinimum(uint256 allowance, uint256 min);
   error AllowanceSystem_AllowancesLimitReached(uint256 length, uint256 max);
-  error AllowanceSystem_InsufficientBalance(uint256 balance, uint256 allowance);
+  error AllowanceSystem_InsufficientBalance(uint256 balance, uint256 required);
+  error AllowanceSystem_InsufficientAllowance(uint256 allowance, uint256 required);
   error AllowanceSystem_NotAuthorized(address caller, address sponsor, address user);
   error AllowanceSystem_NotFound(address user, address sponsor);
 

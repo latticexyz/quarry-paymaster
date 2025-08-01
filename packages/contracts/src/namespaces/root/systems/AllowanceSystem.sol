@@ -17,7 +17,8 @@ uint256 constant MAX_NUM_ALLOWANCES = 20;
 contract AllowanceSystem is System {
   error AllowanceSystem_AllowanceBelowMinimum(uint256 allowance, uint256 min);
   error AllowanceSystem_AllowancesLimitReached(uint256 length, uint256 max);
-  error AllowanceSystem_InsufficientBalance(uint256 balance, uint256 allowance);
+  error AllowanceSystem_InsufficientBalance(uint256 balance, uint256 required);
+  error AllowanceSystem_InsufficientAllowance(uint256 allowance, uint256 required);
   error AllowanceSystem_NotAuthorized(address caller, address sponsor, address user);
   error AllowanceSystem_NotFound(address user, address sponsor);
 
@@ -122,17 +123,17 @@ library AllowanceLib {
     }
   }
 
-  function spendAllowance(address user, uint256 amount) internal returns (uint256 missingAmount) {
+  function spendAllowance(address user, uint256 amount) internal {
     while (amount > 0) {
       address sponsor = AllowanceList._getFirst(user);
       if (sponsor == address(0)) {
-        return amount;
+        revert AllowanceSystem.AllowanceSystem_InsufficientAllowance(0, amount);
       }
 
       AllowanceData memory allowanceItem = Allowance._get({ user: user, sponsor: sponsor });
       if (allowanceItem.allowance > amount) {
         Allowance._setAllowance({ user: user, sponsor: sponsor, allowance: allowanceItem.allowance - amount });
-        return 0;
+        return;
       }
 
       AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: false });
