@@ -6,7 +6,7 @@ import { MudTest } from "@latticexyz/world/test/MudTest.t.sol";
 import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
 import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOwner.sol";
 
-import { AllowanceSystem, AllowanceLib, MIN_ALLOWANCE, MAX_NUM_ALLOWANCES } from "../src/namespaces/root/systems/AllowanceSystem.sol";
+import { AllowanceSystem, MIN_ALLOWANCE, MAX_NUM_ALLOWANCES } from "../src/namespaces/root/systems/AllowanceSystem.sol";
 import { Allowance, AllowanceData } from "../src/namespaces/root/codegen/tables/Allowance.sol";
 import { AllowanceList, AllowanceListData } from "../src/namespaces/root/codegen/tables/AllowanceList.sol";
 import { Balance } from "../src/namespaces/root/codegen/tables/Balance.sol";
@@ -81,7 +81,7 @@ contract AllowanceTest is MudTest {
   function testGrantAllowanceBalanceDecreasesAllowanceIncreases() public {
     uint256 allowanceAmount = 1 ether;
     uint256 initialSponsorBalance = Balance.get(sponsor1);
-    uint256 initialUserAllowance = AllowanceLib.getAllowance(user);
+    uint256 initialUserAllowance = paymaster.getAllowance(user);
 
     // Grant allowance
     vm.prank(sponsor1);
@@ -91,7 +91,7 @@ contract AllowanceTest is MudTest {
     assertEq(Balance.get(sponsor1), initialSponsorBalance - allowanceAmount);
 
     // Check user's allowance increased
-    assertEq(AllowanceLib.getAllowance(user), initialUserAllowance + allowanceAmount);
+    assertEq(paymaster.getAllowance(user), initialUserAllowance + allowanceAmount);
 
     // Check specific allowance from sponsor1 to user
     assertEq(Allowance.getAllowance(user, sponsor1), allowanceAmount);
@@ -209,7 +209,7 @@ contract AllowanceTest is MudTest {
 
     // Verify balance restored
     assertEq(Balance.get(sponsor1), sponsorBalance);
-    assertEq(AllowanceLib.getAllowance(user), 0);
+    assertEq(paymaster.getAllowance(user), 0);
   }
 
   function testOnlyUserOrSponsorCanRemoveAllowance() public {
@@ -228,7 +228,7 @@ contract AllowanceTest is MudTest {
     // Remove as user should work
     vm.prank(user);
     paymaster.removeAllowance(user, sponsor1);
-    assertEq(AllowanceLib.getAllowance(user), 0);
+    assertEq(paymaster.getAllowance(user), 0);
 
     // Grant again
     vm.prank(sponsor1);
@@ -237,7 +237,7 @@ contract AllowanceTest is MudTest {
     // Remove as sponsor should work
     vm.prank(sponsor1);
     paymaster.removeAllowance(user, sponsor1);
-    assertEq(AllowanceLib.getAllowance(user), 0);
+    assertEq(paymaster.getAllowance(user), 0);
   }
 
   function testAllowanceBelowMinimum() public {
@@ -297,7 +297,7 @@ contract AllowanceTest is MudTest {
 
     // Check that allowances were combined
     assertEq(Allowance.getAllowance(user, sponsor1), firstAllowance + additionalAllowance);
-    assertEq(AllowanceLib.getAllowance(user), firstAllowance + additionalAllowance);
+    assertEq(paymaster.getAllowance(user), firstAllowance + additionalAllowance);
     assertEq(AllowanceList.getLength(user), 1); // Still only one entry in the list
   }
 }
