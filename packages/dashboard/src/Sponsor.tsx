@@ -42,7 +42,7 @@ export function Sponsor() {
       <label
         className={twMerge(
           "inline-flex border border-neutral-600 text-sm",
-          "focus-within:outline-2 focus-within:outline-blue-400/60"
+          "focus-within:outline-2 focus-within:outline-blue-400/60 focus-within:text-white"
         )}
       >
         <input
@@ -52,29 +52,13 @@ export function Sponsor() {
           placeholder="Receiver (Ethereum address)"
         />
       </label>
-      <div className="flex flex-col gap-1">
-        <label
-          className={twMerge(
-            "inline-flex border border-neutral-600 text-sm",
-            "focus-within:outline-2 focus-within:outline-blue-400/60"
-          )}
-        >
-          <input
-            name="allowance"
-            required
-            className="w-full p-2 outline-none"
-            placeholder="Allowance amount"
-          />
-          <div className="m-1 p-2 text-xs leading-none bg-neutral-700 text-white inline-flex items-center">
-            ETH
-          </div>
-        </label>
+      <div className="flex flex-col">
         <div className="flex gap-1">
           {["0.005", "0.01", "0.05", "0.1"].map((amount) => (
             <button
               key={amount}
               type="button"
-              className="grow p-1.5 text-xs leading-none bg-neutral-500 hover:brightness-125 active:brightness-90 text-white cursor-pointer focus:outline-2 focus:outline-blue-400/60"
+              className="grow p-1.5 text-xs leading-none bg-neutral-700 hover:brightness-125 active:brightness-90 text-white cursor-pointer focus:outline-2 focus:outline-blue-400/60"
               onClick={(event) => {
                 const input = event.currentTarget.form?.allowance;
                 if (!input) throw new Error("Could not find allowance input.");
@@ -87,6 +71,22 @@ export function Sponsor() {
             </button>
           ))}
         </div>
+        <label
+          className={twMerge(
+            "inline-flex border border-neutral-600 text-sm",
+            "focus-within:outline-2 focus-within:outline-blue-400/60 focus-within:text-white"
+          )}
+        >
+          <input
+            name="allowance"
+            required
+            className="w-full p-2 outline-none"
+            placeholder="Allowance amount"
+          />
+          <div className="m-1 p-2 text-xs leading-none bg-neutral-700 text-white inline-flex items-center">
+            ETH
+          </div>
+        </label>
       </div>
       <button
         type="submit"
