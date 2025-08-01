@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  @apply bg-neutral-900 text-neutral-400;
+  @apply bg-neutral-800 text-neutral-400;
 }
 
 #react-root {
