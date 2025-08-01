@@ -9,4 +9,7 @@ export default defineConfig({
     minify: true,
     sourcemap: true,
   },
+  server: {
+    allowedHosts: [".tunnel.offchain.dev"],
+  },
 });
