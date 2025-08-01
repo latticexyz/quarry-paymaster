@@ -15,6 +15,8 @@ function printAllowance(address user, uint256 limit) view {
     AllowanceData memory allowanceItem = Allowance.get({ user: user, sponsor: sponsor });
     console.log("sponsor", sponsor);
     console.log("allowance", allowanceItem.allowance);
+    console.log("previous", allowanceItem.previous);
+    console.log("next", allowanceItem.next);
     console.log("--------------------------------");
     sponsor = allowanceItem.next;
     limit--;

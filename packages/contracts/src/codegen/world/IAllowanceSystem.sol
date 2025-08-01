@@ -13,6 +13,7 @@ interface IAllowanceSystem {
   error AllowanceSystem_AllowancesLimitReached(uint256 length, uint256 max);
   error AllowanceSystem_InsufficientBalance(uint256 balance, uint256 allowance);
   error AllowanceSystem_NotAuthorized(address caller, address sponsor, address user);
+  error AllowanceSystem_NotFound(address user, address sponsor);
 
   function grantAllowance(address user, uint256 allowance) external payable;
 

@@ -19,6 +19,7 @@ contract AllowanceSystem is System {
   error AllowanceSystem_AllowancesLimitReached(uint256 length, uint256 max);
   error AllowanceSystem_InsufficientBalance(uint256 balance, uint256 allowance);
   error AllowanceSystem_NotAuthorized(address caller, address sponsor, address user);
+  error AllowanceSystem_NotFound(address user, address sponsor);
 
   function grantAllowance(address user, uint256 allowance) public payable {
     if (allowance < MIN_ALLOWANCE) {
@@ -32,6 +33,10 @@ contract AllowanceSystem is System {
     address caller = _msgSender();
     if (caller != sponsor && caller != user) {
       revert AllowanceSystem_NotAuthorized(caller, sponsor, user);
+    }
+    AllowanceData memory allowance = Allowance._get({ user: user, sponsor: sponsor });
+    if (allowance.allowance == 0) {
+      revert AllowanceSystem_NotFound(user, sponsor);
     }
     AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: true });
   }
@@ -73,17 +78,19 @@ library AllowanceLib {
     }
     Balance._set({ user: sponsor, balance: balance - allowance });
 
-    uint256 newAllowance = Allowance._getAllowance({ user: user, sponsor: sponsor }) + allowance;
-
-    AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: true });
+    uint256 currentAllowance = Allowance._getAllowance({ user: user, sponsor: sponsor });
+    if (currentAllowance > 0) {
+      AllowanceLib.removeAllowance({ user: user, sponsor: sponsor, reclaim: true });
+    }
+    uint256 newAllowance = currentAllowance + allowance;
 
     AllowanceListData memory allowanceList = AllowanceList.get(user);
     if (allowanceList.length >= MAX_NUM_ALLOWANCES) {
       revert AllowanceSystem.AllowanceSystem_AllowancesLimitReached(allowanceList.length, MAX_NUM_ALLOWANCES);
     }
 
-    // Find the last sponsor with an allowance less than the new allowance and
-    // the first sponsor with an allowance greater than or equal to the new allowance
+    // Find the last sponsor with an allowance less than the new allowance
+    // and the first sponsor with an allowance greater than or equal to the new allowance
     address previousSponsor;
     address nextSponsor = allowanceList.first;
     AllowanceData memory nextItem = Allowance._get({ user: user, sponsor: nextSponsor });
@@ -93,7 +100,13 @@ library AllowanceLib {
       nextItem = Allowance._get({ user: user, sponsor: nextSponsor });
     }
 
-    Allowance._set({ user: user, sponsor: sponsor, allowance: newAllowance, next: nextSponsor });
+    Allowance._set({
+      user: user,
+      sponsor: sponsor,
+      allowance: newAllowance,
+      next: nextSponsor,
+      previous: previousSponsor
+    });
     AllowanceList._setLength({ user: user, length: AllowanceList._getLength(user) + 1 });
 
     // Link the previous sponsor to the new sponsor
@@ -103,9 +116,9 @@ library AllowanceLib {
       Allowance._setNext({ user: user, sponsor: previousSponsor, next: sponsor });
     }
 
-    // Link the new sponsor to the next sponsor
+    // Link the next sponsor's previous link to the new sponsor
     if (nextSponsor != address(0)) {
-      Allowance._setNext({ user: user, sponsor: sponsor, next: nextSponsor });
+      Allowance._setPrevious({ user: user, sponsor: nextSponsor, previous: sponsor });
     }
   }
 
@@ -129,13 +142,13 @@ library AllowanceLib {
 
   function removeAllowance(address user, address sponsor, bool reclaim) internal {
     AllowanceListData memory allowanceList = AllowanceList._get(user);
-    if (allowanceList.length == 0) {
-      return;
-    }
-
     AllowanceData memory removedItem = Allowance._get({ user: user, sponsor: sponsor });
-    if (removedItem.allowance == 0 && removedItem.next == address(0)) {
-      return;
+    bool exists = allowanceList.first == sponsor ||
+      removedItem.previous != address(0) ||
+      removedItem.next != address(0);
+
+    if (!exists) {
+      revert AllowanceSystem.AllowanceSystem_NotFound(user, sponsor);
     }
 
     Allowance._deleteRecord({ user: user, sponsor: sponsor });
@@ -147,16 +160,14 @@ library AllowanceLib {
     // If the removed item was the list's root, set the root to the next item
     if (allowanceList.first == sponsor) {
       AllowanceList._setFirst({ user: user, first: removedItem.next });
-      return;
+    } else if (removedItem.previous != address(0)) {
+      // If the removed item had a previous item, link the previous item to the next item
+      Allowance._setNext({ user: user, sponsor: removedItem.previous, next: removedItem.next });
     }
 
-    // Link the previous item to the next item
-    address previousSponsor = allowanceList.first;
-    AllowanceData memory previousItem = Allowance._get({ user: user, sponsor: previousSponsor });
-    while (previousItem.next != sponsor) {
-      previousSponsor = previousItem.next;
-      previousItem = Allowance._get({ user: user, sponsor: previousSponsor });
+    // If the removed item had a next item, link the next item to the previous item
+    if (removedItem.next != address(0)) {
+      Allowance._setPrevious({ user: user, sponsor: removedItem.next, previous: removedItem.previous });
     }
-    Allowance._setNext({ user: user, sponsor: previousSponsor, next: removedItem.next });
   }
 }

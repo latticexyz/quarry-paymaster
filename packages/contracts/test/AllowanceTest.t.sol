@@ -121,19 +121,22 @@ contract AllowanceTest is MudTest {
     assertEq(currentSponsor, sponsor1);
     AllowanceData memory currentAllowance = Allowance.get(user, currentSponsor);
     assertEq(currentAllowance.allowance, allowance1);
+    assertEq(currentAllowance.previous, address(0));
 
     // Next should be sponsor2 with 2 ether
     currentSponsor = currentAllowance.next;
     assertEq(currentSponsor, sponsor2);
     currentAllowance = Allowance.get(user, currentSponsor);
     assertEq(currentAllowance.allowance, allowance2);
+    assertEq(currentAllowance.previous, sponsor1);
 
     // Last should be sponsor3 with 3 ether
     currentSponsor = currentAllowance.next;
     assertEq(currentSponsor, sponsor3);
     currentAllowance = Allowance.get(user, currentSponsor);
     assertEq(currentAllowance.allowance, allowance3);
-    assertEq(currentAllowance.next, address(0)); // Last item has no next
+    assertEq(currentAllowance.previous, sponsor2);
+    assertEq(currentAllowance.next, address(0));
   }
 
   function testRemoveLowestAllowanceUpdatesRoot() public {

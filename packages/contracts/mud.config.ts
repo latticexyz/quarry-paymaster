@@ -22,6 +22,7 @@ const config = defineWorld({
             sponsor: "address",
             allowance: "uint256",
             next: "address",
+            previous: "address",
           },
           key: ["user", "sponsor"],
         },

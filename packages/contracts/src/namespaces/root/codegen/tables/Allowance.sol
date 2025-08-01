@@ -19,6 +19,7 @@ import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 struct AllowanceData {
   uint256 allowance;
   address next;
+  address previous;
 }
 
 library Allowance {
@@ -26,12 +27,12 @@ library Allowance {
   ResourceId constant _tableId = ResourceId.wrap(0x74620000000000000000000000000000416c6c6f77616e636556320000000000);
 
   FieldLayout constant _fieldLayout =
-    FieldLayout.wrap(0x0034020020140000000000000000000000000000000000000000000000000000);
+    FieldLayout.wrap(0x0048030020141400000000000000000000000000000000000000000000000000);
 
   // Hex-encoded key schema of (address, address)
   Schema constant _keySchema = Schema.wrap(0x0028020061610000000000000000000000000000000000000000000000000000);
-  // Hex-encoded value schema of (uint256, address)
-  Schema constant _valueSchema = Schema.wrap(0x003402001f610000000000000000000000000000000000000000000000000000);
+  // Hex-encoded value schema of (uint256, address, address)
+  Schema constant _valueSchema = Schema.wrap(0x004803001f616100000000000000000000000000000000000000000000000000);
 
   /**
    * @notice Get the table's key field names.
@@ -48,9 +49,10 @@ library Allowance {
    * @return fieldNames An array of strings with the names of value fields.
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
-    fieldNames = new string[](2);
+    fieldNames = new string[](3);
     fieldNames[0] = "allowance";
     fieldNames[1] = "next";
+    fieldNames[2] = "previous";
   }
 
   /**
@@ -160,6 +162,52 @@ library Allowance {
   }
 
   /**
+   * @notice Get previous.
+   */
+  function getPrevious(address user, address sponsor) internal view returns (address previous) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[1] = bytes32(uint256(uint160(sponsor)));
+
+    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 2, _fieldLayout);
+    return (address(bytes20(_blob)));
+  }
+
+  /**
+   * @notice Get previous.
+   */
+  function _getPrevious(address user, address sponsor) internal view returns (address previous) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[1] = bytes32(uint256(uint160(sponsor)));
+
+    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 2, _fieldLayout);
+    return (address(bytes20(_blob)));
+  }
+
+  /**
+   * @notice Set previous.
+   */
+  function setPrevious(address user, address sponsor, address previous) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[1] = bytes32(uint256(uint160(sponsor)));
+
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 2, abi.encodePacked((previous)), _fieldLayout);
+  }
+
+  /**
+   * @notice Set previous.
+   */
+  function _setPrevious(address user, address sponsor, address previous) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
+    _keyTuple[1] = bytes32(uint256(uint160(sponsor)));
+
+    StoreCore.setStaticField(_tableId, _keyTuple, 2, abi.encodePacked((previous)), _fieldLayout);
+  }
+
+  /**
    * @notice Get the full data.
    */
   function get(address user, address sponsor) internal view returns (AllowanceData memory _table) {
@@ -194,8 +242,8 @@ library Allowance {
   /**
    * @notice Set the full data using individual values.
    */
-  function set(address user, address sponsor, uint256 allowance, address next) internal {
-    bytes memory _staticData = encodeStatic(allowance, next);
+  function set(address user, address sponsor, uint256 allowance, address next, address previous) internal {
+    bytes memory _staticData = encodeStatic(allowance, next, previous);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -210,8 +258,8 @@ library Allowance {
   /**
    * @notice Set the full data using individual values.
    */
-  function _set(address user, address sponsor, uint256 allowance, address next) internal {
-    bytes memory _staticData = encodeStatic(allowance, next);
+  function _set(address user, address sponsor, uint256 allowance, address next, address previous) internal {
+    bytes memory _staticData = encodeStatic(allowance, next, previous);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -227,7 +275,7 @@ library Allowance {
    * @notice Set the full data using the data struct.
    */
   function set(address user, address sponsor, AllowanceData memory _table) internal {
-    bytes memory _staticData = encodeStatic(_table.allowance, _table.next);
+    bytes memory _staticData = encodeStatic(_table.allowance, _table.next, _table.previous);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -243,7 +291,7 @@ library Allowance {
    * @notice Set the full data using the data struct.
    */
   function _set(address user, address sponsor, AllowanceData memory _table) internal {
-    bytes memory _staticData = encodeStatic(_table.allowance, _table.next);
+    bytes memory _staticData = encodeStatic(_table.allowance, _table.next, _table.previous);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -258,10 +306,12 @@ library Allowance {
   /**
    * @notice Decode the tightly packed blob of static data using this table's field layout.
    */
-  function decodeStatic(bytes memory _blob) internal pure returns (uint256 allowance, address next) {
+  function decodeStatic(bytes memory _blob) internal pure returns (uint256 allowance, address next, address previous) {
     allowance = (uint256(Bytes.getBytes32(_blob, 0)));
 
     next = (address(Bytes.getBytes20(_blob, 32)));
+
+    previous = (address(Bytes.getBytes20(_blob, 52)));
   }
 
   /**
@@ -275,7 +325,7 @@ library Allowance {
     EncodedLengths,
     bytes memory
   ) internal pure returns (AllowanceData memory _table) {
-    (_table.allowance, _table.next) = decodeStatic(_staticData);
+    (_table.allowance, _table.next, _table.previous) = decodeStatic(_staticData);
   }
 
   /**
@@ -304,8 +354,8 @@ library Allowance {
    * @notice Tightly pack static (fixed length) data using this table's schema.
    * @return The static data, encoded into a sequence of bytes.
    */
-  function encodeStatic(uint256 allowance, address next) internal pure returns (bytes memory) {
-    return abi.encodePacked(allowance, next);
+  function encodeStatic(uint256 allowance, address next, address previous) internal pure returns (bytes memory) {
+    return abi.encodePacked(allowance, next, previous);
   }
 
   /**
@@ -314,8 +364,12 @@ library Allowance {
    * @return The lengths of the dynamic fields (packed into a single bytes32 value).
    * @return The dynamic (variable length) data, encoded into a sequence of bytes.
    */
-  function encode(uint256 allowance, address next) internal pure returns (bytes memory, EncodedLengths, bytes memory) {
-    bytes memory _staticData = encodeStatic(allowance, next);
+  function encode(
+    uint256 allowance,
+    address next,
+    address previous
+  ) internal pure returns (bytes memory, EncodedLengths, bytes memory) {
+    bytes memory _staticData = encodeStatic(allowance, next, previous);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
