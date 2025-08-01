@@ -10,8 +10,9 @@ import { Balance } from "../codegen/tables/Balance.sol";
 import { Spender } from "../codegen/tables/Spender.sol";
 import { SystemConfig } from "../codegen/tables/SystemConfig.sol";
 import { recoverCallWithSignature } from "../utils/recoverCallWithSignature.sol";
+import { AllowanceLib } from "./AllowanceSystem.sol";
 
-uint256 constant FIXED_POST_OP_GAS = 60_000;
+uint256 constant FIXED_POST_OP_GAS = 80_000;
 
 contract PaymasterSystem is System, IPaymaster {
   error PaymasterSystem_InsufficientFunds(
@@ -48,23 +49,17 @@ contract PaymasterSystem is System, IPaymaster {
     _requireFromEntryPoint();
 
     address user = _getUser(userOp);
-    uint256 availableAllowance = Allowance._get(user);
-    uint256 fromAllowance = maxCost;
-    uint256 fromBalance = 0;
+    uint256 fromBalance = AllowanceLib.getMissingAllowance(user, maxCost);
+    uint256 fromAllowance = maxCost - fromBalance;
 
-    if (fromAllowance > availableAllowance) {
-      fromBalance = fromAllowance - availableAllowance;
+    if (fromBalance > 0) {
       uint256 availableBalance = Balance._get(user);
       if (fromBalance > availableBalance) {
-        revert PaymasterSystem_InsufficientFunds(user, maxCost, availableAllowance, availableBalance);
+        revert PaymasterSystem_InsufficientFunds(user, maxCost, fromAllowance, availableBalance);
       }
-      fromAllowance -= fromBalance;
-      Balance._set(user, availableBalance - fromBalance);
     }
 
-    Allowance._set(user, availableAllowance - fromAllowance);
-
-    context = abi.encode(user, fromAllowance, fromBalance);
+    context = abi.encode(user, fromAllowance);
   }
 
   /**
@@ -88,37 +83,20 @@ contract PaymasterSystem is System, IPaymaster {
   ) public override {
     _requireFromEntryPoint();
 
-    (address user, uint256 fromAllowance, uint256 fromBalance) = abi.decode(context, (address, uint256, uint256));
+    (address user, uint256 fromAllowance) = abi.decode(context, (address, uint256));
 
     uint256 totalGasCost = actualGasCost + FIXED_POST_OP_GAS * actualUserOpFeePerGas;
-    uint256 allowanceRefund; // always non-negative
-    int256 balanceDiff; // may be negative if FIXED_POST_OP_GAS made the real cost exceed the deducted balance+allowance
 
     if (totalGasCost > fromAllowance) {
-      // If FIXED_POST_OP_GAS made the total cost exceed the deducted balance+allowance,
-      // we attempt to deduct the missing amount from the balance below.
-      balanceDiff = int256(fromAllowance + fromBalance) - int256(totalGasCost);
-    } else {
-      allowanceRefund = fromAllowance - totalGasCost;
-      balanceDiff = int256(fromBalance);
-    }
-
-    if (balanceDiff != 0) {
+      AllowanceLib.spendAllowance(user, fromAllowance);
+      uint256 fromBalance = totalGasCost - fromAllowance;
       uint256 currentBalance = Balance._get(user);
-      int256 newBalance = int256(currentBalance) + balanceDiff;
-      if (newBalance < 0) {
-        revert PaymasterSystem_InsufficientFunds(
-          user,
-          totalGasCost,
-          Allowance._get(user) + fromAllowance,
-          currentBalance + fromBalance
-        );
+      if (fromBalance > currentBalance) {
+        revert PaymasterSystem_InsufficientFunds(user, totalGasCost, fromAllowance, currentBalance);
       }
-      Balance._set(user, uint256(newBalance));
-    }
-
-    if (allowanceRefund > 0) {
-      Allowance._set(user, Allowance._get(user) + allowanceRefund);
+      Balance._set(user, currentBalance - fromBalance);
+    } else {
+      AllowanceLib.spendAllowance(user, totalGasCost);
     }
   }
 

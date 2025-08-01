@@ -74,17 +74,6 @@ contract BalanceTest is MudTest {
     assertEq(depositor.balance, 0);
   }
 
-  function testDepositExceedsMaxBalance() public {
-    uint256 depositAmount = 0.2 ether; // Exceeds MAX_BALANCE of 0.1 ether
-    vm.deal(user, depositAmount);
-
-    vm.prank(user);
-    vm.expectRevert(
-      abi.encodeWithSignature("BalanceSystem_BalanceTooHigh(address,uint256,uint256)", user, depositAmount, 0.1 ether)
-    );
-    paymaster.depositTo{ value: depositAmount }(user);
-  }
-
   function testWithdraw() public {
     // First deposit some funds
     uint256 depositAmount = 0.05 ether;

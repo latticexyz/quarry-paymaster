@@ -14,38 +14,25 @@ const config = defineWorld({
           key: ["user"],
         },
         // Allowance gets granted and is not withdrawable
+        // Allowance is organized as a linked list and gets spent from smallest to largest
         Allowance: {
+          name: "AllowanceV2",
           schema: {
             user: "address",
+            sponsor: "address",
             allowance: "uint256",
+            next: "address",
+            previous: "address",
+          },
+          key: ["user", "sponsor"],
+        },
+        AllowanceList: {
+          schema: {
+            user: "address",
+            first: "address",
+            length: "uint256",
           },
           key: ["user"],
-        },
-        Grantor: {
-          schema: {
-            grantor: "address",
-            allowance: "uint256",
-          },
-          key: ["grantor"],
-        },
-        PassHolder: {
-          schema: {
-            user: "address",
-            passId: "bytes32",
-            lastRenewed: "uint256",
-            lastClaimed: "uint256",
-          },
-          key: ["user", "passId"],
-        },
-        PassConfig: {
-          schema: {
-            passId: "bytes32",
-            claimAmount: "uint256",
-            claimInterval: "uint256",
-            validityPeriod: "uint256",
-            grantor: "address",
-          },
-          key: ["passId"],
         },
         Spender: {
           schema: {

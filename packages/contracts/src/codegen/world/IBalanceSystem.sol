@@ -9,7 +9,6 @@ pragma solidity >=0.8.24;
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IBalanceSystem {
-  error BalanceSystem_BalanceTooHigh(address user, uint256 balance, uint256 max);
   error BalanceSystem_InsufficientBalance(address user, uint256 amount, uint256 balance);
 
   function depositTo(address to) external payable;
