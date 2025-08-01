@@ -17,7 +17,9 @@ export function Providers({ children }: Props) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <EntryKitProvider config={defineConfig({ chainId, worldAddress })}>
+        <EntryKitProvider
+          config={defineConfig({ chainId, worldAddress, theme: "dark" })}
+        >
           <ConnectedSyncProvider>{children}</ConnectedSyncProvider>
         </EntryKitProvider>
       </QueryClientProvider>
