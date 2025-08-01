@@ -1,16 +1,12 @@
 procs:
-  client:
-    cwd: packages/client
+  dashboard:
+    cwd: packages/dashboard
     shell: pnpm vite
-  contracts:
-    cwd: packages/contracts
-    shell: pnpm mud dev-contracts --rpc http://127.0.0.1:8545
   anvil:
-    cwd: packages/contracts
     shell: anvil --block-time 2 --load-state anvil-state.json
-  explorer:
-    cwd: packages/contracts
-    shell: pnpm explorer
+  # explorer:
+  #   cwd: packages/contracts
+  #   shell: pnpm explorer
   sponsor-api:
     cwd: packages/sponsor-api
-    shell: echo 'sleep 4' && sleep 4 && pnpm start
+    shell: pnpm start
