@@ -1,4 +1,3 @@
-import "tailwindcss/tailwind.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Providers } from "./Providers";
@@ -15,5 +14,5 @@ createRoot(document.getElementById("react-root")!).render(
         <Explorer />
       </Providers>
     </ErrorBoundary>
-  </StrictMode>,
+  </StrictMode>
 );

@@ -16,7 +16,7 @@ export function Explorer() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="outline-none flex justify-end gap-2 p-2 font-medium leading-none text-black"
+        className="outline-none flex justify-end gap-2 p-2 font-medium leading-none"
       >
         {open ? (
           <>Close</>
@@ -26,7 +26,12 @@ export function Explorer() {
           </>
         )}
       </button>
-      {open ? <iframe src={`${explorerUrl}/${worldAddress}`} className="bg-black h-[50vh]" /> : null}
+      {open ? (
+        <iframe
+          src={`${explorerUrl}/${worldAddress}`}
+          className="bg-black h-[50vh]"
+        />
+      ) : null}
     </div>
   );
 }

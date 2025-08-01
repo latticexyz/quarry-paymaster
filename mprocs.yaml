@@ -4,9 +4,11 @@ procs:
     shell: pnpm vite
   anvil:
     shell: anvil --block-time 2 --load-state anvil-state.json
-  # explorer:
-  #   cwd: packages/contracts
-  #   shell: pnpm explorer
+  explorer:
+    cwd: packages/contracts
+    shell: pnpm explorer
+    env:
+      INDEXER_PORT: "13691"
   sponsor-api:
     cwd: packages/sponsor-api
     shell: pnpm start
