@@ -5,6 +5,7 @@
     "build": "pnpm recursive run build",
     "dev:setup": "mprocs --config mprocs.setup.yaml",
     "dev": "mprocs",
+    "dev:ui": "mprocs --config mprocs.ui.yaml",
     "dev:dashboard": "pnpm --filter 'dashboard' run dev",
     "dev:contracts": "pnpm --filter 'contracts' dev",
     "foundry:up": "curl -L https://foundry.paradigm.xyz | bash && bash $HOME/.foundry/bin/foundryup",

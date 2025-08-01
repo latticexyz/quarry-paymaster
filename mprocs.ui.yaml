@@ -2,12 +2,13 @@ procs:
   dashboard:
     cwd: packages/dashboard
     shell: pnpm vite
-  contracts:
-    cwd: packages/contracts
-    shell: pnpm dev
+  anvil:
+    shell: anvil --block-time 2 --load-state anvil-state.json
   explorer:
     cwd: packages/contracts
     shell: pnpm explorer
+    env:
+      INDEXER_PORT: "13691"
   sponsor-api:
     cwd: packages/sponsor-api
-    shell: echo 'sleep 4' && sleep 4 && pnpm start
+    shell: pnpm start
