@@ -26,7 +26,7 @@ contract SpenderSystem is System {
     // Require the spender account to not have own balance.
     // A spender always spends from the user allowance, so registering an
     // account with own allowance as spender would lock its allowance.
-    if (AllowanceLib.getAvailableAllowance(spender) > 0 || Balance._get(spender) > 0) {
+    if (AllowanceLib.getAllowance(spender) > 0 || Balance._get(spender) > 0) {
       revert SpenderSystem_HasOwnBalance(spender);
     }
 

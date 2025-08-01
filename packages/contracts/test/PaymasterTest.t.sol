@@ -154,8 +154,6 @@ contract PaymasterTest is MudTest {
     AllowanceLib.grantAllowance(address(account), grantor, partialAllowance);
     vm.stopPrank();
 
-    // vm.prank(grantor);
-    // paymaster.grantAllowance(address(account), partialAllowance);
     assertEq(Balance.getBalance(grantor), sponsorBalance - partialAllowance);
     assertEq(AllowanceLib.getAvailableAllowance(address(account)), partialAllowance);
 

@@ -37,7 +37,7 @@ contract AllowanceSystem is System {
   }
 
   function getAllowance(address user) public view returns (uint256) {
-    return AllowanceLib.getAvailableAllowance(user);
+    return AllowanceLib.getAllowance(user);
   }
 }
 
@@ -55,7 +55,7 @@ library AllowanceLib {
     return amount;
   }
 
-  function getAvailableAllowance(address user) internal view returns (uint256) {
+  function getAllowance(address user) internal view returns (uint256) {
     address sponsor = AllowanceList.getFirst(user);
     uint256 available = 0;
     while (sponsor != address(0)) {
