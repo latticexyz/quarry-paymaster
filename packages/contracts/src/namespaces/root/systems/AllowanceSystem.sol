@@ -6,7 +6,6 @@ import { System } from "@latticexyz/world/src/System.sol";
 import { Balance } from "../codegen/tables/Balance.sol";
 import { Allowance, AllowanceData } from "../codegen/tables/Allowance.sol";
 import { AllowanceList, AllowanceListData } from "../codegen/tables/AllowanceList.sol";
-import { BlockedAllowance } from "../codegen/tables/BlockedAllowance.sol";
 import { SystemConfig } from "../codegen/tables/SystemConfig.sol";
 import { IEntryPoint } from "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
@@ -45,7 +44,6 @@ contract AllowanceSystem is System {
 library AllowanceLib {
   function getMissingAllowance(address user, uint256 amount) internal view returns (uint256) {
     address sponsor = AllowanceList.getFirst(user);
-    amount += BlockedAllowance.get(user);
     while (sponsor != address(0)) {
       AllowanceData memory allowanceItem = Allowance.get({ user: user, sponsor: sponsor });
       if (allowanceItem.allowance >= amount) {
@@ -65,7 +63,7 @@ library AllowanceLib {
       available += allowanceItem.allowance;
       sponsor = allowanceItem.next;
     }
-    return available - BlockedAllowance.get(user);
+    return available;
   }
 
   function grantAllowance(address user, address sponsor, uint256 allowance) internal {
@@ -109,14 +107,6 @@ library AllowanceLib {
     if (nextSponsor != address(0)) {
       Allowance.setNext({ user: user, sponsor: sponsor, next: nextSponsor });
     }
-  }
-
-  function blockAllowance(address user, uint256 amount) internal {
-    BlockedAllowance.set({ user: user, blocked: BlockedAllowance.get(user) + amount });
-  }
-
-  function unblockAllowance(address user, uint256 amount) internal {
-    BlockedAllowance.set({ user: user, blocked: BlockedAllowance.get(user) - amount });
   }
 
   function spendAllowance(address user, uint256 amount) internal returns (uint256 missingAmount) {

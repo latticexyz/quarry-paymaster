@@ -6,6 +6,5 @@ pragma solidity >=0.8.24;
 import { Balance } from "./tables/Balance.sol";
 import { Allowance, AllowanceData } from "./tables/Allowance.sol";
 import { AllowanceList, AllowanceListData } from "./tables/AllowanceList.sol";
-import { BlockedAllowance } from "./tables/BlockedAllowance.sol";
 import { Spender } from "./tables/Spender.sol";
 import { SystemConfig } from "./tables/SystemConfig.sol";

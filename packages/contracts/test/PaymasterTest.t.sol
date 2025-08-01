@@ -13,7 +13,6 @@ import { PaymasterSystem } from "../src/namespaces/root/systems/PaymasterSystem.
 import { Allowance } from "../src/namespaces/root/codegen/tables/Allowance.sol";
 import { AllowanceList } from "../src/namespaces/root/codegen/tables/AllowanceList.sol";
 import { AllowanceLib } from "../src/namespaces/root/systems/AllowanceSystem.sol";
-import { BlockedAllowance } from "../src/namespaces/root/codegen/tables/BlockedAllowance.sol";
 import { Balance } from "../src/namespaces/root/codegen/tables/Balance.sol";
 import { SystemConfig } from "../src/namespaces/root/codegen/tables/SystemConfig.sol";
 import { TestCounter } from "./utils/TestCounter.sol";
@@ -333,9 +332,6 @@ contract PaymasterTest is MudTest {
     assertLt(sponsor2Allowance, secondAllowance);
     assertGt(sponsor2Allowance, 0);
     assertEq(AllowanceLib.getAvailableAllowance(address(account)), sponsor2Allowance);
-
-    // Verify there is no blocked allowance after the operation
-    assertEq(BlockedAllowance.get(address(account)), 0);
 
     // Verify beneficiary received payment
     assertGt(beneficiary.balance, 0);

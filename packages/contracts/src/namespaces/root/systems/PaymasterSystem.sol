@@ -57,12 +57,9 @@ contract PaymasterSystem is System, IPaymaster {
       if (fromBalance > availableBalance) {
         revert PaymasterSystem_InsufficientFunds(user, maxCost, fromAllowance, availableBalance);
       }
-      Balance._set(user, availableBalance - fromBalance);
     }
 
-    AllowanceLib.blockAllowance(user, fromAllowance);
-
-    context = abi.encode(user, fromAllowance, fromBalance);
+    context = abi.encode(user, fromAllowance);
   }
 
   /**
@@ -86,29 +83,21 @@ contract PaymasterSystem is System, IPaymaster {
   ) public override {
     _requireFromEntryPoint();
 
-    (address user, uint256 fromAllowance, uint256 fromBalance) = abi.decode(context, (address, uint256, uint256));
-    AllowanceLib.unblockAllowance(user, fromAllowance);
+    (address user, uint256 fromAllowance) = abi.decode(context, (address, uint256));
 
     uint256 totalGasCost = actualGasCost + FIXED_POST_OP_GAS * actualUserOpFeePerGas;
-    int256 balanceDiff; // may be negative if FIXED_POST_OP_GAS made the real cost exceed the deducted balance+allowance
 
     if (totalGasCost > fromAllowance) {
-      // If FIXED_POST_OP_GAS made the total cost exceed the deducted balance+allowance,
-      // we attempt to deduct the missing amount from the balance below.
-      balanceDiff = int256(fromAllowance + fromBalance) - int256(totalGasCost);
       AllowanceLib.spendAllowance(user, fromAllowance);
-    } else {
-      balanceDiff = int256(fromBalance);
-      AllowanceLib.spendAllowance(user, totalGasCost);
-    }
-
-    if (balanceDiff != 0) {
+      uint256 fromBalance = totalGasCost - fromAllowance;
       uint256 currentBalance = Balance._get(user);
-      int256 newBalance = int256(currentBalance) + balanceDiff;
+      int256 newBalance = int256(currentBalance) - int256(fromBalance);
       if (newBalance < 0) {
-        revert PaymasterSystem_InsufficientFunds(user, totalGasCost, fromAllowance, currentBalance + fromBalance);
+        revert PaymasterSystem_InsufficientFunds(user, totalGasCost, fromAllowance, currentBalance);
       }
       Balance._set(user, uint256(newBalance));
+    } else {
+      AllowanceLib.spendAllowance(user, totalGasCost);
     }
   }
 
