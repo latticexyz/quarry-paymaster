@@ -91,11 +91,10 @@ contract PaymasterSystem is System, IPaymaster {
       AllowanceLib.spendAllowance(user, fromAllowance);
       uint256 fromBalance = totalGasCost - fromAllowance;
       uint256 currentBalance = Balance._get(user);
-      int256 newBalance = int256(currentBalance) - int256(fromBalance);
-      if (newBalance < 0) {
+      if (fromBalance > currentBalance) {
         revert PaymasterSystem_InsufficientFunds(user, totalGasCost, fromAllowance, currentBalance);
       }
-      Balance._set(user, uint256(newBalance));
+      Balance._set(user, currentBalance - fromBalance);
     } else {
       AllowanceLib.spendAllowance(user, totalGasCost);
     }
