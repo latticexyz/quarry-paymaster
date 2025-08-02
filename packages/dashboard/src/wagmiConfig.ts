@@ -1,29 +1,53 @@
 import { Chain, http, webSocket } from "viem";
-import { anvil } from "viem/chains";
+import { anvil as anvilConfig } from "viem/chains";
 import { createWagmiConfig } from "@latticexyz/entrykit/internal";
-import { garnet, pyrope, redstone } from "@latticexyz/common/chains";
+import {
+  garnet,
+  pyrope,
+  redstone as redstoneConfig,
+} from "@latticexyz/common/chains";
 import { chainId } from "./common";
+import worlds from "contracts/worlds.json";
+
+const redstone = {
+  ...redstoneConfig,
+  rpcUrls: {
+    ...redstoneConfig.rpcUrls,
+    bundler: {
+      http: ["https://rpc.redstonechain.com"],
+    },
+  },
+  contracts: {
+    ...redstoneConfig.contracts,
+    quarryPaymaster: {
+      address: worlds[690]!.address,
+      blockCreated: worlds[690]!.blockNumber,
+    },
+  },
+};
+
+const anvil = {
+  ...anvilConfig,
+  contracts: {
+    ...anvilConfig.contracts,
+    paymaster: {
+      address: "0xf03E61E7421c43D9068Ca562882E98d1be0a6b6e",
+    },
+  },
+  blockExplorers: {
+    default: {} as never,
+    worldsExplorer: {
+      name: "MUD Worlds Explorer",
+      url: "http://localhost:13690/anvil/worlds",
+    },
+  },
+};
 
 export const chains = [
   redstone,
   garnet,
   pyrope,
-  {
-    ...anvil,
-    contracts: {
-      ...anvil.contracts,
-      paymaster: {
-        address: "0xf03E61E7421c43D9068Ca562882E98d1be0a6b6e",
-      },
-    },
-    blockExplorers: {
-      default: {} as never,
-      worldsExplorer: {
-        name: "MUD Worlds Explorer",
-        url: "http://localhost:13690/anvil/worlds",
-      },
-    },
-  },
+  anvil,
 ] as const satisfies Chain[];
 
 export const transports = {
