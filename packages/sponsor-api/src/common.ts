@@ -1,5 +1,7 @@
+import { defineTable } from "@latticexyz/store/internal";
 import { type } from "arktype";
 import { EIP1193Parameters, EIP1193RequestFn, Hex, isHex, RpcSchema } from "viem";
+import env from "./env";
 
 export const HexType = type("string").pipe.try((input): Hex => {
   if (isHex(input)) {
@@ -19,3 +21,14 @@ export type TransportRequestFn<rpcSchema extends RpcSchema> = <
   args: args,
   options?: Parameters<EIP1193RequestFn>[1],
 ) => Promise<method["ReturnType"]>;
+
+export const GrantsTable = defineTable({
+  namespace: env.NAMESPACE,
+  schema: {
+    user: "address",
+    amount: "uint256",
+    lastUpdated: "uint32",
+  },
+  label: "Grants",
+  key: ["user"],
+});

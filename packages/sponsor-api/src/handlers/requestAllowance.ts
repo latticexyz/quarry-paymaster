@@ -1,12 +1,14 @@
 import { type } from "arktype";
-import { HexType } from "../common";
+import { GrantsTable, HexType } from "../common";
 import { params } from "./common";
 import { decodeErrorResult, formatAbiItemWithArgs, getAction, isHex } from "viem/utils";
-import { bundlerClient, getSmartAccountClient } from "../clients";
+import { bundlerClient, getSmartAccountClient, publicClient } from "../clients";
 import { sendUserOperation, UserOperationReceipt, waitForUserOperationReceipt } from "viem/account-abstraction";
 import { paymaster } from "../contract";
 import { debug } from "../debug";
 import env from "../env";
+import { getRecord } from "@latticexyz/store/internal";
+import { Call, Hex, padHex, toHex } from "viem";
 
 /**
  * [receiver: Hex]
@@ -19,23 +21,66 @@ export async function requestAllowance(rawInput: typeof params.infer) {
     throw new Error(input.summary);
   }
 
-  const smartAccountClient = await getSmartAccountClient();
-
   const [receiver] = input;
+  const shouldTrackGrants = Boolean(env.NAMESPACE);
+
+  if (shouldTrackGrants) {
+    const existingGrant = await getExistingGrant({ user: receiver });
+    if (existingGrant > 0n) {
+      throw new Error(`User ${receiver} already received a grant.`);
+    }
+  }
+
+  const smartAccountClient = await getSmartAccountClient();
+  const grantAmount = BigInt(env.ALLOWANCE_AMOUNT);
+
+  const grantAllowanceCall = {
+    abi: paymaster.abi,
+    to: paymaster.address,
+    functionName: "grantAllowance",
+    args: [receiver, grantAmount],
+  } satisfies Call;
+
+  const trackAllowanceCalls = [
+    // Store grant amount
+    {
+      abi: paymaster.abi,
+      to: paymaster.address,
+      functionName: "setField",
+      args: [
+        GrantsTable.tableId,
+        [padHex(receiver, { size: 32, dir: "left" })],
+        0,
+        padHex(toHex(grantAmount), { size: 32, dir: "left" }),
+      ],
+    },
+    // Store last updated timestamp in seconds
+    {
+      abi: paymaster.abi,
+      to: paymaster.address,
+      functionName: "setField",
+      args: [
+        GrantsTable.tableId,
+        [padHex(receiver, { size: 32, dir: "left" })],
+        1,
+        padHex(toHex(Math.floor(Date.now() / 1000)), { size: 4, dir: "left" }),
+      ],
+    },
+  ] satisfies Call[];
+
+  const calls = [
+    // Grant allowance
+    grantAllowanceCall,
+    ...(shouldTrackGrants ? trackAllowanceCalls : []),
+  ] satisfies Call[];
+
   debug(`sending user operation to grant allowance to ${receiver}`);
   const hash = await getAction(
     smartAccountClient,
     sendUserOperation,
     "sendUserOperation",
   )({
-    calls: [
-      {
-        abi: paymaster.abi,
-        to: paymaster.address,
-        functionName: "grantAllowance",
-        args: [receiver, BigInt(env.ALLOWANCE_AMOUNT)],
-      },
-    ],
+    calls,
     maxFeePerGas: 100_000n,
     maxPriorityFeePerGas: 0n,
     preVerificationGas: 100_000n,
@@ -56,6 +101,15 @@ export async function requestAllowance(rawInput: typeof params.infer) {
 
   debug(`successfully granted allowance to ${receiver}`);
   return { message: `Successfully granted allowance to ${receiver}.`, hash };
+}
+
+async function getExistingGrant({ user }: { user: Hex }): Promise<bigint> {
+  const { amount } = await getRecord(publicClient, {
+    table: GrantsTable,
+    key: { user },
+    address: paymaster.address,
+  });
+  return amount;
 }
 
 function formatRevertReason(receipt: UserOperationReceipt): string {

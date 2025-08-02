@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsup && chmod +x ./dist/index.js",
-    "start": ". .env && pnpm build && CHAIN_ID=$CHAIN_ID SPONSOR_PRIVATE_KEY=$SPONSOR_PRIVATE_KEY ALLOWANCE_AMOUNT=$ALLOWANCE_AMOUNT DEBUG=paymaster node ./dist/index.js",
+    "start": ". .env && pnpm build && CHAIN_ID=$CHAIN_ID SPONSOR_PRIVATE_KEY=$SPONSOR_PRIVATE_KEY ALLOWANCE_AMOUNT=$ALLOWANCE_AMOUNT DEBUG=paymaster NAMESPACE=$NAMESPACE node ./dist/index.js",
     "dev": "tsup --watch",
     "test": "tsc --noEmit"
   },

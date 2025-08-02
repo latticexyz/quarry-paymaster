@@ -5,6 +5,7 @@ const env = type({
   CHAIN_ID: "string",
   SPONSOR_PRIVATE_KEY: "string",
   ALLOWANCE_AMOUNT: "string",
+  "NAMESPACE?": "string",
   "PORT?": "string",
 });
 
