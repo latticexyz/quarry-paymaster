@@ -5,8 +5,6 @@ import { createSyncAdapter } from "@latticexyz/store-sync/internal";
 import { stash } from "./stash";
 import { useAccount } from "wagmi";
 import { AccountButton } from "@latticexyz/entrykit/internal";
-import { Hex, padHex } from "viem";
-import { encodeKey } from "@latticexyz/stash/internal";
 
 export type Props = {
   children: ReactNode;
@@ -15,7 +13,6 @@ export type Props = {
 export function ConnectedSyncProvider({ children }: Props) {
   const worldAddress = getWorldAddress();
   const user = useAccount();
-  console.log("user", user.address);
 
   if (!user.address) {
     return (
@@ -27,9 +24,6 @@ export function ConnectedSyncProvider({ children }: Props) {
       </div>
     );
   }
-
-  const userKey = padHex(user.address, { dir: "left", size: 32 });
-  console.log("userKey", userKey);
 
   return (
     <SyncProvider
