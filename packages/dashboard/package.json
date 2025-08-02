@@ -1,40 +1,45 @@
 {
-  "name": "client",
+  "name": "dashboard",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
     "test": "tsc --noEmit"
   },
-  "author": "",
   "dependencies": {
     "@latticexyz/common": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
-    "@latticexyz/config": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
+    "@latticexyz/entrykit": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/explorer": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
-    "@latticexyz/protocol-parser": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
+    "@latticexyz/react": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/schema-type": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/stash": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
-    "@latticexyz/store": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/store-sync": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
+    "@latticexyz/utils": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/world": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
+    "@tanstack/react-query": "^5.63.0",
     "contracts": "workspace:*",
-    "permissionless": "^0.2.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "viem": "2.30.6"
+    "debug": "^4.3.7",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-error-boundary": "5.0.0",
+    "sponsor-api": "workspace:*",
+    "tailwind-merge": "^2.6.0",
+    "viem": "2.30.6",
+    "wagmi": "2.15.5"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
+    "@tailwindcss/vite": "^4.1.11",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
     "eslint-plugin-react": "7.31.11",
     "eslint-plugin-react-hooks": "4.6.0",
-    "prettier": "3.2.5",
-    "typescript": "5.4.2",
-    "vite": "^5.4.6"
+    "tailwindcss": "^4.1.11",
+    "vite": "^6.0.7",
+    "vite-plugin-mud": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a"
   }
 }

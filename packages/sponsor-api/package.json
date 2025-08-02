@@ -10,6 +10,9 @@
     "test": "tsc --noEmit"
   },
   "author": "",
+  "exports": {
+    "./internal": "./src/exports/internal.ts"
+  },
   "devDependencies": {
     "@koa/bodyparser": "^5.1.1",
     "@koa/cors": "^5.0.0",
@@ -30,6 +33,7 @@
     "@types/node": "^22.5.5",
     "arktype": "2.0.0-rc.14",
     "contracts": "workspace:*",
+    "debug": "^4.3.7",
     "koa": "^2.15.3",
     "koa-compose": "^4.1.0",
     "permissionless": "^0.2.3",
@@ -38,7 +42,6 @@
     "typescript": "5.4.2",
     "viem": "2.30.6",
     "vite": "^5.4.6",
-    "debug": "^4.3.7"
-  },
-  "dependencies": {}
+    "wait-on": "^8.0.4"
+  }
 }

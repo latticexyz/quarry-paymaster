@@ -1,10 +1,12 @@
 {
-  "name": "mud-template-vanilla",
+  "name": "quarry-paymaster",
   "private": true,
   "scripts": {
     "build": "pnpm recursive run build",
+    "dev:setup": "mprocs --config mprocs.setup.yaml",
     "dev": "mprocs",
-    "dev:client": "pnpm --filter 'client' run dev",
+    "dev:ui": "mprocs --config mprocs.ui.yaml",
+    "dev:dashboard": "pnpm --filter 'dashboard' run dev",
     "dev:contracts": "pnpm --filter 'contracts' dev",
     "foundry:up": "curl -L https://foundry.paradigm.xyz | bash && bash $HOME/.foundry/bin/foundryup",
     "mud:up": "pnpm mud set-version --tag main && pnpm install",
@@ -14,13 +16,14 @@
   "devDependencies": {
     "@latticexyz/cli": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/common": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
+    "@latticexyz/entrykit": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/explorer": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/store-indexer": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@types/debug": "4.1.7",
     "@typescript-eslint/eslint-plugin": "7.1.1",
     "@typescript-eslint/parser": "7.1.1",
     "eslint": "8.57.0",
-    "mprocs": "^0.7.1",
+    "mprocs": "^0.7.3",
     "shx": "^0.3.4",
     "typescript": "5.4.2"
   },
