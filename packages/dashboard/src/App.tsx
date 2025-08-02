@@ -19,7 +19,7 @@ export function App() {
         >
           <div className="grid grid-cols-2 gap-16">
             <div className="border border-dashed border-neutral-600 p-8 space-y-8">
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 flex flex-col items-center">
                 <h1 className="text-4xl font-mono text-white">Sponsor</h1>
                 <p className="max-w-72 text-sm text-pretty">
                   Grant a gas allowance to other accounts, allowing them to
@@ -30,7 +30,7 @@ export function App() {
               <Sponsor />
             </div>
             <div className="border border-dashed border-neutral-600 p-8 space-y-8">
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 flex flex-col items-center">
                 <h1 className="text-4xl font-mono text-white">Allowances</h1>
                 <p className="max-w-72 text-sm text-pretty">
                   Allowances you’ve received from sponsors. They are spent from

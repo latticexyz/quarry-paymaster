@@ -10,4 +10,4 @@ procs:
     shell: pnpm explorer
   sponsor-api:
     cwd: packages/sponsor-api
-    shell: echo 'sleep 4' && sleep 4 && pnpm start
+    shell: pnpm wait-on ../contracts/deploys/31337/latest.json && echo 'sleep 1' && sleep 1 && pnpm start

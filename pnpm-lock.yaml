@@ -98,7 +98,7 @@ importers:
         version: 2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a
       wait-on:
         specifier: ^8.0.4
-        version: 8.0.4
+        version: 8.0.4(debug@4.3.7)
 
   packages/dashboard:
     dependencies:
@@ -274,6 +274,9 @@ importers:
       vite:
         specifier: ^5.4.6
         version: 5.4.8(@types/node@22.7.5)
+      wait-on:
+        specifier: ^8.0.4
+        version: 8.0.4(debug@4.3.7)
 
 packages:
 
@@ -14142,7 +14145,7 @@ packages:
       - utf-8-validate
       - zod
 
-  /wait-on@8.0.4:
+  /wait-on@8.0.4(debug@4.3.7):
     resolution: {integrity: sha512-8f9LugAGo4PSc0aLbpKVCVtzayd36sSCp4WLpVngkYq6PK87H79zt77/tlCU6eKCLqR46iFvcl0PU5f+DmtkwA==}
     engines: {node: '>=12.0.0'}
     hasBin: true

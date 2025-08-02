@@ -1,7 +1,6 @@
-import { useCallback, useState } from "react";
-import { Address, getAddress, isAddress, parseEther } from "viem";
+import { getAddress, isAddress, parseEther } from "viem";
 import { grantAllowance } from "./grantAllowance";
-import { SessionClient, useSessionClient } from "@latticexyz/entrykit/internal";
+import { useSessionClient } from "@latticexyz/entrykit/internal";
 import { useMutation } from "@tanstack/react-query";
 import { twMerge } from "tailwind-merge";
 
@@ -112,10 +111,12 @@ export function Sponsor() {
           </span>
         </span>
       </button>
-      {grant.error ? (
-        <div className="text-red-500">{grant.error.message}</div>
-      ) : null}
-      {grant.data ? <div>{grant.data.message}</div> : null}
+      <div className="text-sm mx-auto max-w-sm text-center flex flex-col items-center mt-2">
+        {grant.error ? (
+          <div className="text-red-500">{grant.error.message}</div>
+        ) : null}
+        {grant.data ? <div>{grant.data.message}</div> : null}
+      </div>
     </form>
   );
 }
