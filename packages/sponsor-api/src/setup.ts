@@ -43,7 +43,7 @@ async function ensureNamespace(namespace: string) {
   });
 
   if (owner === smartAccountClient.account.address) {
-    debug(`namespace ${namespace} already exists and is owned by the smart account`);
+    debug(`namespace ${namespace} already exists and is owned by configured sponsor account`);
     return;
   }
 

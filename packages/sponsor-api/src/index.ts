@@ -25,4 +25,4 @@ setup().catch((e) => {
   process.exit(1);
 });
 
-getSmartAccountClient().then(async (client) => console.log(`Sponsor account address: ${client.account.address}`));
+getSmartAccountClient().then((client) => console.log(`Sponsor account address: ${client.account.address}`));

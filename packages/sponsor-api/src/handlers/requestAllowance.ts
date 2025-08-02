@@ -68,11 +68,7 @@ export async function requestAllowance(rawInput: typeof params.infer) {
     },
   ] satisfies Call[];
 
-  const calls = [
-    // Grant allowance
-    grantAllowanceCall,
-    ...(shouldTrackGrants ? trackAllowanceCalls : []),
-  ] satisfies Call[];
+  const calls = [grantAllowanceCall, ...(shouldTrackGrants ? trackAllowanceCalls : [])] satisfies Call[];
 
   debug(`sending user operation to grant allowance to ${receiver}`);
   const hash = await getAction(
