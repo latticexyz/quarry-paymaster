@@ -28,6 +28,7 @@ export function App() {
                 </p>
               </div>
               <Sponsor />
+              <Allowances direction="provided" />
             </div>
             <div className="border border-dashed border-neutral-600 p-8 space-y-8">
               <div className="text-center space-y-2 flex flex-col items-center">
@@ -37,7 +38,7 @@ export function App() {
                   lowest to highest.
                 </p>
               </div>
-              <Allowances />
+              <Allowances direction="received" />
             </div>
           </div>
         </Synced>
