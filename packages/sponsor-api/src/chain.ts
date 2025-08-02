@@ -6,12 +6,6 @@ import { garnet } from "./garnet";
 
 const anvilWithPaymaster = {
   ...anvil,
-  rpcUrls: {
-    ...anvil.rpcUrls,
-    bundler: {
-      http: ["http://127.0.0.1:4337"],
-    },
-  },
   contracts: {
     quarryPaymaster: {
       address: worlds[31337]!.address,

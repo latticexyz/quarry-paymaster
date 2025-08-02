@@ -1,16 +1,19 @@
 {
-  "name": "client",
+  "name": "sponsor-api",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "preview": "vite preview",
+    "build": "tsup && chmod +x ./dist/index.js",
+    "start": ". .env && pnpm build && CHAIN_ID=$CHAIN_ID SPONSOR_PRIVATE_KEY=$SPONSOR_PRIVATE_KEY ALLOWANCE_AMOUNT=$ALLOWANCE_AMOUNT DEBUG=paymaster NAMESPACE=$NAMESPACE node ./dist/index.js",
+    "dev": "tsup --watch",
     "test": "tsc --noEmit"
   },
   "author": "",
-  "dependencies": {
+  "devDependencies": {
+    "@koa/bodyparser": "^5.1.1",
+    "@koa/cors": "^5.0.0",
+    "@koa/router": "^13.1.0",
     "@latticexyz/common": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/config": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/explorer": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
@@ -20,21 +23,22 @@
     "@latticexyz/store": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/store-sync": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
     "@latticexyz/world": "2.2.23-94cac741be24bb5743f2f36235cc3bb40012417a",
-    "contracts": "workspace:*",
-    "permissionless": "^0.2.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "viem": "2.30.6"
-  },
-  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "@types/koa-compose": "^3.2.8",
+    "@types/koa__cors": "^5.0.0",
+    "@types/koa__router": "^12.0.4",
     "@types/node": "^22.5.5",
-    "@types/react": "18.2.22",
-    "@types/react-dom": "18.2.7",
-    "@vitejs/plugin-react": "^4.3.1",
-    "eslint-plugin-react": "7.31.11",
-    "eslint-plugin-react-hooks": "4.6.0",
+    "arktype": "2.0.0-rc.14",
+    "contracts": "workspace:*",
+    "koa": "^2.15.3",
+    "koa-compose": "^4.1.0",
+    "permissionless": "^0.2.3",
     "prettier": "3.2.5",
+    "tsup": "^8.3.0",
     "typescript": "5.4.2",
-    "vite": "^5.4.6"
-  }
+    "viem": "2.30.6",
+    "vite": "^5.4.6",
+    "debug": "^4.3.7"
+  },
+  "dependencies": {}
 }

@@ -1,12 +1,10 @@
-import { claimAllowance } from "./claimAllowance";
-import { issuePass } from "./issuePass";
 import { Handler, Handlers } from "./common";
+import { requestAllowance } from "./requestAllowance";
 export * from "./common";
 
 export const handlers = {
-  quarry: {
-    claimAllowance,
-    issuePass,
+  sponsor: {
+    requestAllowance,
   },
 } satisfies Handlers;
 

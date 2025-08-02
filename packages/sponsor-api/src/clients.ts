@@ -6,6 +6,7 @@ import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { chain } from "./chain";
 import { paymaster } from "./contract";
 import env from "./env";
+import { getBundlerTransport } from "./getBundlerTransport";
 
 const clientOptions = {
   chain,
@@ -15,8 +16,7 @@ const clientOptions = {
 
 export const publicClient = createPublicClient(clientOptions);
 
-// export const bundlerTransport = wiresaw(http(chain.rpcUrls.bundler.http[0]));
-export const bundlerTransport = http(chain.rpcUrls.bundler.http[0]);
+export const bundlerTransport = getBundlerTransport(chain);
 export const bundlerClient = createBundlerClient({
   ...clientOptions,
   transport: bundlerTransport,
@@ -32,7 +32,7 @@ async function getSmartAccount(): Promise<SmartAccount> {
     client: publicClient,
     entryPoint: { address: entryPoint07Address, version: "0.7" },
     factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
-    owner: createBurnerAccount(env.ISSUER_PRIVATE_KEY as Hex),
+    owner: createBurnerAccount(env.SPONSOR_PRIVATE_KEY as Hex),
   });
 
   return smartAccount;

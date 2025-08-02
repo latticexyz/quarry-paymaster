@@ -58,7 +58,7 @@ const config = defineWorld({
   },
   deploy: {
     upgradeableWorldImplementation: true,
-    postDeployScript: "PostDeployKms.s.sol",
+    // postDeployScript: "PostDeployKms",
   },
 });
 

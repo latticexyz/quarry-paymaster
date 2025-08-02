@@ -1,7 +1,7 @@
 import { type } from "arktype";
 
-export const namespace = type("'quarry'");
-export const method = type("'claimAllowance' | 'issuePass'");
+export const namespace = type("'sponsor'");
+export const method = type("'requestAllowance'");
 export const params = type("(string | number | boolean)[]");
 export const parseParams = type("string").pipe((s) => JSON.parse(s), params);
 
