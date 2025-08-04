@@ -9,14 +9,9 @@ pragma solidity >=0.8.24;
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IAllowanceSystem {
-  error AllowanceSystem_AllowanceBelowMinimum(uint256 allowance, uint256 min);
-  error AllowanceSystem_AllowancesLimitReached(uint256 length, uint256 max);
-  error AllowanceSystem_InsufficientBalance(uint256 balance, uint256 required);
   error AllowanceSystem_InsufficientAllowance(uint256 allowance, uint256 required);
   error AllowanceSystem_NotAuthorized(address caller, address sponsor, address user);
   error AllowanceSystem_NotFound(address user, address sponsor);
-
-  function grantAllowance(address user, uint256 allowance) external payable;
 
   function removeAllowance(address user, address sponsor) external;
 
