@@ -6,6 +6,7 @@ pragma solidity >=0.8.24;
 import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
 import { IAllowanceSystem } from "./IAllowanceSystem.sol";
 import { IBalanceSystem } from "./IBalanceSystem.sol";
+import { IGrantSystem } from "./IGrantSystem.sol";
 import { IPaymasterSystem } from "./IPaymasterSystem.sol";
 import { ISpenderSystem } from "./ISpenderSystem.sol";
 import { IAdminSystem } from "./IAdminSystem.sol";
@@ -22,6 +23,7 @@ interface IWorld is
   IBaseWorld,
   IAllowanceSystem,
   IBalanceSystem,
+  IGrantSystem,
   IPaymasterSystem,
   ISpenderSystem,
   IAdminSystem,

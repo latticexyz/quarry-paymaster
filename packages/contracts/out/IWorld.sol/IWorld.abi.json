@@ -1737,58 +1737,10 @@
   },
   {
     "type": "error",
-    "name": "AllowanceSystem_AllowanceBelowMinimum",
-    "inputs": [
-      {
-        "name": "allowance",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "min",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "AllowanceSystem_AllowancesLimitReached",
-    "inputs": [
-      {
-        "name": "length",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "max",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
     "name": "AllowanceSystem_InsufficientAllowance",
     "inputs": [
       {
         "name": "allowance",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "required",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "AllowanceSystem_InsufficientBalance",
-    "inputs": [
-      {
-        "name": "balance",
         "type": "uint256",
         "internalType": "uint256"
       },
@@ -1949,6 +1901,54 @@
       },
       {
         "name": "maxFields",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "GrantSystem_AllowanceBelowMinimum",
+    "inputs": [
+      {
+        "name": "allowance",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "min",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "GrantSystem_AllowancesLimitReached",
+    "inputs": [
+      {
+        "name": "length",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "max",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "GrantSystem_InsufficientBalance",
+    "inputs": [
+      {
+        "name": "balance",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "required",
         "type": "uint256",
         "internalType": "uint256"
       }

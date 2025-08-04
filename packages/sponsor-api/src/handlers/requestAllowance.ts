@@ -117,17 +117,17 @@ function formatRevertReason(receipt: UserOperationReceipt): string {
 
   let output = formatAbiItemWithArgs(reason) + "\n\n";
 
-  if (reason.errorName === "AllowanceSystem_AllowanceBelowMinimum") {
+  if (reason.errorName === "GrantSystem_AllowanceBelowMinimum") {
     output += `Allowance below minimum.`;
     output += "\n\n";
   }
 
-  if (reason.errorName === "AllowanceSystem_InsufficientBalance") {
+  if (reason.errorName === "GrantSystem_InsufficientBalance") {
     output += `Sponsor balance is not sufficient to grant allowance.`;
     output += "\n\n";
   }
 
-  if (reason.errorName === "AllowanceSystem_AllowancesLimitReached") {
+  if (reason.errorName === "GrantSystem_AllowancesLimitReached") {
     output += `User has reached the maximum number of allowances. Remove one and try again.`;
     output += "\n\n";
   }

@@ -6,7 +6,8 @@ import { MudTest } from "@latticexyz/world/test/MudTest.t.sol";
 import { ROOT_NAMESPACE_ID } from "@latticexyz/world/src/constants.sol";
 import { NamespaceOwner } from "@latticexyz/world/src/codegen/tables/NamespaceOwner.sol";
 
-import { AllowanceSystem, MIN_ALLOWANCE, MAX_NUM_ALLOWANCES } from "../src/namespaces/root/systems/AllowanceSystem.sol";
+import { AllowanceSystem } from "../src/namespaces/root/systems/AllowanceSystem.sol";
+import { GrantSystem, MIN_ALLOWANCE, MAX_NUM_ALLOWANCES } from "../src/namespaces/root/systems/GrantSystem.sol";
 import { Allowance, AllowanceData } from "../src/namespaces/root/codegen/tables/Allowance.sol";
 import { AllowanceList, AllowanceListData } from "../src/namespaces/root/codegen/tables/AllowanceList.sol";
 import { Balance } from "../src/namespaces/root/codegen/tables/Balance.sol";
@@ -73,7 +74,7 @@ contract AllowanceTest is MudTest {
     // Try to grant allowance without having a balance
     vm.prank(sponsorWithoutBalance);
     vm.expectRevert(
-      abi.encodeWithSignature("AllowanceSystem_InsufficientBalance(uint256,uint256)", 0, allowanceAmount)
+      abi.encodeWithSignature("GrantSystem_InsufficientBalance(uint256,uint256)", 0, allowanceAmount)
     );
     paymaster.grantAllowance(user, allowanceAmount);
   }
@@ -249,7 +250,7 @@ contract AllowanceTest is MudTest {
     vm.prank(sponsor1);
     vm.expectRevert(
       abi.encodeWithSignature(
-        "AllowanceSystem_AllowanceBelowMinimum(uint256,uint256)",
+        "GrantSystem_AllowanceBelowMinimum(uint256,uint256)",
         tooSmallAllowance,
         MIN_ALLOWANCE
       )
@@ -278,7 +279,7 @@ contract AllowanceTest is MudTest {
     vm.prank(extraSponsor);
     vm.expectRevert(
       abi.encodeWithSignature(
-        "AllowanceSystem_AllowancesLimitReached(uint256,uint256)",
+        "GrantSystem_AllowancesLimitReached(uint256,uint256)",
         MAX_NUM_ALLOWANCES,
         MAX_NUM_ALLOWANCES
       )
