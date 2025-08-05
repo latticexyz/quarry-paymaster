@@ -2,6 +2,7 @@ import { AccountButton } from "@latticexyz/entrykit/internal";
 import { Synced } from "./mud/Synced";
 import { Allowances } from "./Allowances";
 import { Sponsor } from "./Sponsor";
+import { RequestButton } from "./RequestButton";
 
 export function App() {
   return (
@@ -38,6 +39,7 @@ export function App() {
                   lowest to highest.
                 </p>
               </div>
+              <RequestButton />
               <Allowances direction="received" />
             </div>
           </div>

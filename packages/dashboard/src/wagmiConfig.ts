@@ -41,6 +41,12 @@ const anvil = {
       url: "http://localhost:13690/anvil/worlds",
     },
   },
+  rpcUrls: {
+    ...anvilConfig.rpcUrls,
+    quarrySponsor: {
+      http: ["http://localhost:3003/rpc"],
+    },
+  },
 };
 
 export const chains = [
