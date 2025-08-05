@@ -13,12 +13,11 @@ export function RequestButton() {
   const request = useMutation({
     mutationKey: ["requestAllowance", sessionClient?.uid],
     async mutationFn({ user }: { user: Hex }) {
-      if (!sessionClient) throw new Error("Not connected.");
       return await requestAllowance({ chain: getChain(), userAddress: user });
     },
   });
 
-  const disabled = !account.address || !sessionClient;
+  const disabled = !account.address;
 
   return (
     <>
