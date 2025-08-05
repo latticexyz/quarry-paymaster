@@ -16,6 +16,9 @@ const redstone = {
     bundler: {
       http: ["https://rpc.redstonechain.com"],
     },
+    quarrySponsor: {
+      http: ["https://sponsor.mud.redstonechain.com/rpc"],
+    },
   },
   contracts: {
     ...redstoneConfig.contracts,
