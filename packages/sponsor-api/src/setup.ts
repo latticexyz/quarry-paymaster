@@ -9,7 +9,7 @@ import worldConfig from "@latticexyz/world/mud.config";
 import storeConfig from "@latticexyz/store/mud.config";
 import { resourceToHex, resourceToLabel } from "@latticexyz/common";
 
-import { decodeErrorResult, isHex, zeroAddress } from "viem";
+import { decodeErrorResult, formatEther, isHex, zeroAddress } from "viem";
 import {
   getKeySchema,
   getSchemaTypes,
@@ -19,6 +19,7 @@ import {
   valueSchemaToHex,
 } from "@latticexyz/protocol-parser/internal";
 import { GrantsTable } from "./common";
+import { getBalance } from "viem/actions";
 
 export async function setup() {
   if (!env.NAMESPACE) {
@@ -30,6 +31,7 @@ export async function setup() {
 
   await ensureNamespace(env.NAMESPACE);
   await ensureTable({ table: GrantsTable });
+  await ensureAllowance();
 }
 
 async function ensureNamespace(namespace: string) {
@@ -132,6 +134,45 @@ async function ensureTable({ table }: EnsureTableOptions) {
   }
 
   debug(`successfully registered table ${resourceToLabel(table)}`);
+}
+
+async function ensureAllowance() {
+  const smartAccountClient = await getSmartAccountClient();
+  const sponsorAddress = smartAccountClient.account.address;
+  const balance = await getBalance(smartAccountClient, { address: sponsorAddress });
+  const gasBuffer = 1_000_000_000_000_000n;
+
+  if (balance < gasBuffer) {
+    console.log(`sponsor ${sponsorAddress} balance too low to top up: ${formatEther(balance)}`);
+    return;
+  }
+
+  const hash = await getAction(
+    smartAccountClient,
+    sendUserOperation,
+    "sendUserOperation",
+  )({
+    calls: [
+      {
+        abi: paymaster.abi,
+        to: paymaster.address,
+        functionName: "depositTo",
+        args: [sponsorAddress],
+        value: balance - gasBuffer,
+      },
+    ],
+  });
+
+  debug(`waiting for user operation receipt for tx ${hash}`);
+  const receipt = await getAction(bundlerClient, waitForUserOperationReceipt, "waitForUserOperationReceipt")({ hash });
+
+  if (!receipt.success) {
+    const errorMessage = formatRevertReason(receipt);
+    debug(errorMessage);
+    throw new Error(errorMessage);
+  }
+
+  debug(`successfully topped up sponsor balance`);
 }
 
 function formatRevertReason(receipt: UserOperationReceipt): string {
